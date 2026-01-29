@@ -1,2 +1,2 @@
 # Intelligent-Inventory-and-Demand-Monitoring
-Implement alert system for small warehouses about their stocks
+We implemented an alert system for small-scale warehouses that notifies managers when stock levels are low relative to demand
