@@ -4,8 +4,11 @@ const app = express()
 const PORT = process.env.port || 5000
 const routes = require("./router/router");
 const cors = require("cors")
+const configDB = require("./src/config/db")
 
 app.use(cors())
+
+configDB();
 
 
 app.use(express.json())
