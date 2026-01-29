@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const InventoryProducts = new mongoose.Schema(
+const InventoryProductsSchema = new mongoose.Schema(
   {
     itemId: {
       type: String,
@@ -38,4 +38,5 @@ const InventoryProducts = new mongoose.Schema(
   { timestamps: true },
 );
 
-module.exports = mongoose.model("InventoryProducts", InventoryProducts);
+module.exports = mongoose.model("products", InventoryProductsSchema);
+

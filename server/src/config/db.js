@@ -7,11 +7,8 @@ dotenv.config()
 const userName = encodeURIComponent(process.env.Email);
 const password = encodeURIComponent(process.env.Password);
 
+const dbUri = `mongodb+srv://${userName}:${password}@questions.e2ai2cz.mongodb.net/Inventory-monitoring?retryWrites=true&w=majority&authSource=admin`;
 
-const dbUri = `mongodb+srv://${userName}:${password}@questions.e2ai2cz.mongodb.net/Inventory-monitoring`;
-
-
-console.log(dbUri, "DB")
 
 
 
