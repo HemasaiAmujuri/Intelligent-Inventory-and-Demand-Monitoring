@@ -3,14 +3,21 @@ const userSchema = require("../../models/user/user")
 const bcrypt = require("bcrypt")
 const saltRounds = 10;
 
-const registerController = async(res,req) => {
+const registerController = async(req,res) => {
     try{
     const data = req.body;
+
+    const existingUser = await userSchema.findOne({ email : data.email});
+
+    if(existingUser){
+        return res.status(200).json({ success : true, message : "User already exist, Please Login"})
+    }
     if(data.password){
-       const hashedPassword = await bcrypt.hash(data?.password)
+       const hashedPassword = await bcrypt.hash(data?.password, saltRounds)
        data.password = hashedPassword;
     }
     const user = await new userSchema(data);
+    await user.save()
     return res.status(200).json({ success : true , data : user, message : "Data received successfully"})
 }catch(err){
     console.log(err.message);
@@ -20,7 +27,7 @@ const registerController = async(res,req) => {
 
 
 
-const loginController = async(req,req) => {
+const loginController = async(req,res) => {
     try{
         const { email, password } = req.body;
         const user = await userSchema.findOne({ email : email})
@@ -28,7 +35,7 @@ const loginController = async(req,req) => {
         if(!user){
             return res.status(404).json({ success : false, message : "User not found"})
         }
-        const isMatch = await bcrypt.compare(user.password, password)
+        const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch){
             return res.status(404).json({ success : false, message : "Invalid Credentials"})
         }

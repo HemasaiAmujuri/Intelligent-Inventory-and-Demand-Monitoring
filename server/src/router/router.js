@@ -5,8 +5,8 @@ const { registerController, loginController } = require("../controllers/user/use
 
 
 router.get("/inventory/inventoryList",  getInventoryProducts);
-router.post("/user/regiser",registerController);
-router.post("user/login",loginController)
+router.post("/user/register",registerController);
+router.post("/user/login",loginController)
 
 
 
