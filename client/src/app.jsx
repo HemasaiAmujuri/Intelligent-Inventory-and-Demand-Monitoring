@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import InventoryList from '../src/pages/inventoryList'
+import InventoryList from './pages/inventoryList'
 
 
 function App() {
