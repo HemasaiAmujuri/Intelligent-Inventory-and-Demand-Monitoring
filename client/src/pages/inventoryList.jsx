@@ -13,7 +13,7 @@ function InventoryList() {
     reOrderPoint: 0,
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const [search, setSearch] = useState("")
+  const [search, setSearch] = useState("");
   const itemsPerPage = 12;
 
   useEffect(() => {
@@ -45,14 +45,14 @@ function InventoryList() {
         },
         body: JSON.stringify(formData),
       });
-      if(response.ok){
+      if (response.ok) {
         setFormData({
-    name: "",
-    category: "",
-    quantity: "",
-    reOrderPoint: "",
-  })
-}
+          name: "",
+          category: "",
+          quantity: "",
+          reOrderPoint: "",
+        });
+      }
     } catch (err) {
       console.log(err);
     }
@@ -64,23 +64,34 @@ function InventoryList() {
 
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
-  const categories = [  "electronics",  "stationery", "groceries", "furniture", "clothing", "tools", "toys", "cosmetics", "sports", "books","other" ] 
+  const categories = [
+    "electronics",
+    "stationery",
+    "groceries",
+    "furniture",
+    "clothing",
+    "tools",
+    "toys",
+    "cosmetics",
+    "sports",
+    "books",
+    "other",
+  ];
 
-   function Capitalise(word){
-    if(!word){
-      return " "
+  function Capitalise(word) {
+    if (!word) {
+      return " ";
     }
-    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-   }
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  }
 
+  if (search.length >= 3) {
+    currentItems = currentItems.filter((user) => {
+      console.log(user.name, "name");
+      return user.name.toLowerCase().includes(search.toLowerCase());
+    });
+  }
 
-   if(search.length >= 3){
-    currentItems  = currentItems.filter((user) => {
-      console.log(user.name, "name")
-       return user.name.toLowerCase().includes(search.toLowerCase())
-    })
-}
- 
   return (
     <div className="relative">
       <div className="flex-col justify-between items-center mb-8">
@@ -96,8 +107,14 @@ function InventoryList() {
         </div>
 
         <div className="relative">
-          <input type ="text"  placeholder='search...' value = {search} onChange={(e) => setSearch(e.target.value)}className="outline-none border rounded-lg bg-gray-200 ml-108 mt-3 mb-2 p-1 "/>
-          <BsSearch className='absolute left-150 top-5'/>
+          <input
+            type="text"
+            placeholder="search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="outline-none border rounded-lg bg-gray-200 ml-108 mt-3 mb-2 p-1 "
+          />
+          <BsSearch className="absolute left-150 top-5" />
         </div>
 
         <div className="flex justify-center items-center">
@@ -116,9 +133,13 @@ function InventoryList() {
             <tbody>
               {currentItems.map((item, index) => (
                 <tr key={item.id} className="text-center">
-                  <td className="border px-4 py-2">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                  <td className="border px-4 py-2">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>
                   <td className="border px-4 py-2">{item.name}</td>
-                  <td className="border px-4 py-2">{Capitalise(item.category)}</td>
+                  <td className="border px-4 py-2">
+                    {Capitalise(item.category)}
+                  </td>
                   <td className="border px-4 py-2">{item.currentStock}</td>
                   <td className="border px-4 py-2">{item.reOrderPoint}</td>
                   <td className="border px-4 py-2 font semi-bold">
@@ -134,53 +155,58 @@ function InventoryList() {
               ))}
             </tbody>
 
-      <div className="fixed flex justify-center items-center z-20 mt-10 ml-35">
-  <div className="flex gap-2">
-    <button
-      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-      disabled={currentPage === 1}
-      className="px-3 py-1 border rounded disabled:opacity-50"
-    >
-      Prev
-    </button>
+            <div className="fixed flex justify-center items-center z-20 mt-10 ml-35">
+              <div className="flex gap-2">
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 border rounded disabled:opacity-50"
+                >
+                  Prev
+                </button>
 
-    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-      <button
-        key={page}
-        onClick={() => setCurrentPage(page)}
-        className={`px-3 py-1 border rounded ${
-          page === currentPage ? "bg-blue-600 text-white" : ""
-        }`}
-      >
-        {page}
-      </button>
-    ))}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-3 py-1 border rounded ${
+                        page === currentPage ? "bg-blue-600 text-white" : ""
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ),
+                )}
 
-    <button
-      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-      disabled={currentPage === totalPages}
-      className="px-3 py-1 border rounded disabled:opacity-50"
-    >
-      Next
-    </button>
-  </div>
-</div>
-
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 border rounded disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </table>
         </div>
         {showForm && (
           <form
-            onSubmit={(e) => (handleSubmit(e))}
+            onSubmit={(e) => handleSubmit(e)}
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
                  bg-white border border-gray-300 rounded-xl shadow-lg p-6 w-full max-w-md z-10"
           >
-             <button
-      type="button"
-      onClick={() => setShowForm(false)}
-      className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 font-bold text-xl"
-    >
-      ×
-    </button>
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 font-bold text-xl"
+            >
+              ×
+            </button>
 
             <h1 className="text-2xl font-bold text-center mb-4">
               Add Inventory
@@ -207,12 +233,14 @@ function InventoryList() {
                 required
                 className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               >
-              <option > Select Category </option>
-              {categories.map(( cat, index) => (
-                 <option key={index} value = {cat.toLowerCase()}> {Capitalise(cat)} </option>
-              ))}
+                <option> Select Category </option>
+                {categories.map((cat, index) => (
+                  <option key={index} value={cat.toLowerCase()}>
+                    {" "}
+                    {Capitalise(cat)}{" "}
+                  </option>
+                ))}
               </select>
-              
             </div>
 
             <div className="flex flex-col mb-2">

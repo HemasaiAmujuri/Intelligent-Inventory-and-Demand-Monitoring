@@ -10,7 +10,7 @@ const registerController = async(req,res) => {
     const existingUser = await userSchema.findOne({ email : data.email});
 
     if(existingUser){
-        return res.status(200).json({ success : true, message : "User already exist, Please Login"})
+        return res.status(409).json({ success : true, message : "User already exist, Please Login"})
     }
     if(data.password){
        const hashedPassword = await bcrypt.hash(data?.password, saltRounds)
@@ -18,7 +18,7 @@ const registerController = async(req,res) => {
     }
     const user = await new userSchema(data);
     await user.save()
-    return res.status(200).json({ success : true , data : user, message : "Data received successfully"})
+    return res.status(200).json({ success : true , data : user, message : "Register Successfully"})
 }catch(err){
     console.log(err.message);
     return res.status(500).json({ success : false, message : err.message})
