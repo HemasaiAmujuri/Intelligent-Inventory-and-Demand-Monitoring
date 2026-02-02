@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { BsSearch } from "react-icons/bs";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -12,6 +13,7 @@ function InventoryList() {
     reOrderPoint: 0,
   });
   const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState("")
   const itemsPerPage = 12;
 
   useEffect(() => {
@@ -58,7 +60,7 @@ function InventoryList() {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+  let currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
 
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
@@ -70,6 +72,14 @@ function InventoryList() {
     }
     return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
    }
+
+
+   if(search.length >= 3){
+    currentItems  = currentItems.filter((user) => {
+      console.log(user.name, "name")
+       return user.name.toLowerCase().includes(search.toLowerCase())
+    })
+}
  
   return (
     <div className="relative">
@@ -83,6 +93,11 @@ function InventoryList() {
           >
             + Add Inventory
           </button>
+        </div>
+
+        <div className="relative">
+          <input type ="text"  placeholder='search...' value = {search} onChange={(e) => setSearch(e.target.value)}className="outline-none border rounded-lg bg-gray-200 ml-108 mt-3 mb-2 p-1 "/>
+          <BsSearch className='absolute left-150 top-5'/>
         </div>
 
         <div className="flex justify-center items-center">
