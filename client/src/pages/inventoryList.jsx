@@ -8,8 +8,8 @@ function InventoryList() {
   const [formData, setFormData] = useState({
     name: "",
     category: "",
-    quantity: "",
-    reOrderPoint: "",
+    quantity: 0,
+    reOrderPoint: 0,
   });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
@@ -89,6 +89,7 @@ function InventoryList() {
           <table className="border border-gray-300">
             <thead className="bg-gray-100">
               <tr>
+                <th className="border px-4 py-2">S.NO</th>
                 <th className="border px-4 py-2">Name</th>
                 <th className="border px-4 py-2">Category</th>
                 <th className="border px-4 py-2">Current Stock</th>
@@ -98,8 +99,9 @@ function InventoryList() {
             </thead>
 
             <tbody>
-              {currentItems.map((item) => (
+              {currentItems.map((item, index) => (
                 <tr key={item.id} className="text-center">
+                  <td className="border px-4 py-2">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                   <td className="border px-4 py-2">{item.name}</td>
                   <td className="border px-4 py-2">{Capitalise(item.category)}</td>
                   <td className="border px-4 py-2">{item.currentStock}</td>

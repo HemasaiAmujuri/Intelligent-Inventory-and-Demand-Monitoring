@@ -20,15 +20,17 @@ const addInventoryProducts = async(req,res) => {
          return res.status(400).json({ message : "Please, fill all required fields"});
       }
 
-      const existingInventory = await InventoryProductsSchema.find({ name : name })
+      const existingInventory = await InventoryProductsSchema.findOne({ name : name });
 
-      if(existingInventory.length > 0){
-         existingInventory.currentStock += quantity;
+
+      if(existingInventory){
+         existingInventory.currentStock += Number(quantity);
          await existingInventory.save();
          return res.status(200).json({ success : true, data : existingInventory, message : "Data updated successfully"})
       }
 
-      const data = await new InventoryProductsSchema({ name, category, currentStock : quantity, reOrderPoint});
+
+      const data = await new InventoryProductsSchema({ name, category, currentStock : quantity, reOrderPoint : Number(reOrderPoint) });
       await data.save();
       return res.status(200).json({ success : true, data : data, message : "Data Saved Successfully"})
    }catch(err){
