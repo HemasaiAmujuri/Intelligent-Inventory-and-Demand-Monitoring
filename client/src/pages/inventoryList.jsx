@@ -8,16 +8,16 @@ function InventoryList() {
   const [formData, setFormData] = useState({
     name: "",
     category: "",
-    currentStock: "",
+    quantity: "",
     reOrderPoint: "",
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          `${baseURL}/api/inventory/inventoryList`
-        );
+        const response = await fetch(`${baseURL}/api/inventory/inventoryList`);
         const result = await response.json();
         setData(result.data || []);
       } catch (error) {
@@ -29,15 +29,13 @@ function InventoryList() {
     fetchData();
   }, []);
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  const handleChange = ((e) => {
-    setFormData({ ...formData, [e.target.name] : e.target.value});
-  });
-
-
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
+    try {
       const response = await fetch(`${baseURL}/api/inventory/addInventory`, {
         method: "POST",
         headers: {
@@ -45,54 +43,192 @@ function InventoryList() {
         },
         body: JSON.stringify(formData),
       });
-    }catch(err){
+      if(response.ok){
+        setFormData({
+    name: "",
+    category: "",
+    quantity: "",
+    reOrderPoint: "",
+  })
+}
+    } catch (err) {
       console.log(err);
     }
-
   };
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+
+  const categories = [  "electronics",  "stationery", "groceries", "furniture", "clothing", "tools", "toys", "cosmetics", "sports", "books","other" ] 
+
+   function Capitalise(word){
+    if(!word){
+      return " "
+    }
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+   }
+ 
   return (
-   <div className="flex-col justify-between items-center mb-8">
+    <div className="relative">
+      <div className="flex-col justify-between items-center mb-8">
+        <div className="flex items-center justify-between mt-10 mb-5 ml-150">
+          <h1 className="text-5xl font-bold">Inventory List</h1>
 
-    <div className="flex items-center justify-between mt-10 mb-5 ml-150">
-  <h1 className="text-5xl font-bold">
-    Inventory List
-  </h1>
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mr-50"
+          >
+            + Add Inventory
+          </button>
+        </div>
 
-  <button
-    onClick={() => setShowForm(true)}
-    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mr-50"
-  >
-    + Add Inventory
-  </button>
+        <div className="flex justify-center items-center">
+          <table className="border border-gray-300">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border px-4 py-2">Name</th>
+                <th className="border px-4 py-2">Category</th>
+                <th className="border px-4 py-2">Current Stock</th>
+                <th className="border px-4 py-2">Reorder Point</th>
+                <th className="border px-4 py-2">Status</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {currentItems.map((item) => (
+                <tr key={item.id} className="text-center">
+                  <td className="border px-4 py-2">{item.name}</td>
+                  <td className="border px-4 py-2">{Capitalise(item.category)}</td>
+                  <td className="border px-4 py-2">{item.currentStock}</td>
+                  <td className="border px-4 py-2">{item.reOrderPoint}</td>
+                  <td className="border px-4 py-2 font semi-bold">
+                    {item.currentStock === 0 ? (
+                      <span className="text-red-500">Out of Stock</span>
+                    ) : item.currentStock < item.reOrderPoint ? (
+                      <span className="text-yellow-500">Low</span>
+                    ) : (
+                      <span className="text-green-500">Healthy</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+
+      <div className="fixed flex justify-center items-center z-20 mt-10 ml-35">
+  <div className="flex gap-2">
+    <button
+      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      disabled={currentPage === 1}
+      className="px-3 py-1 border rounded disabled:opacity-50"
+    >
+      Prev
+    </button>
+
+    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+      <button
+        key={page}
+        onClick={() => setCurrentPage(page)}
+        className={`px-3 py-1 border rounded ${
+          page === currentPage ? "bg-blue-600 text-white" : ""
+        }`}
+      >
+        {page}
+      </button>
+    ))}
+
+    <button
+      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+      disabled={currentPage === totalPages}
+      className="px-3 py-1 border rounded disabled:opacity-50"
+    >
+      Next
+    </button>
+  </div>
 </div>
 
+          </table>
+        </div>
+        {showForm && (
+          <form
+            onSubmit={(e) => (handleSubmit(e))}
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+                 bg-white border border-gray-300 rounded-xl shadow-lg p-6 w-full max-w-md z-10"
+          >
+             <button
+      type="button"
+      onClick={() => setShowForm(false)}
+      className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 font-bold text-xl"
+    >
+      ×
+    </button>
 
-      <div className="flex justify-center items-center">
-      <table className="border border-gray-300">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="border px-4 py-2">Name</th>
-            <th className="border px-4 py-2">Category</th>
-            <th className="border px-4 py-2">Current Stock</th>
-            <th className="border px-4 py-2">Reorder Point</th>
-            <th className="border px-4 py-2">Status</th>
-          </tr>
-        </thead>
+            <h1 className="text-2xl font-bold text-center mb-4">
+              Add Inventory
+            </h1>
 
-        <tbody>
-          {data.map((item) => (
-            <tr key={item.id} className="text-center">
-              <td className="border px-4 py-2">{item.name}</td>
-              <td className="border px-4 py-2">{item.category}</td>
-              <td className="border px-4 py-2">{item.currentStock}</td>
-              <td className="border px-4 py-2">{item.reOrderPoint}</td>
-              <td className="border px-4 py-2 font semi-bold">
-                 {item.currentStock === 0 ? (<span className="text-red-500">Out of Stock</span>) : item.currentStock < item.reOrderPoint ? (<span className="text-yellow-500">Low</span>) : (<span className="text-green-500">Healthy</span>)}</td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+            <div className="flex flex-col mb-2">
+              <label className="font-semibold mb-1">Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <label className="font-semibold mb-1">Category</label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                required
+                className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+              <option > Select Category </option>
+              {categories.map(( cat, index) => (
+                 <option key={index} value = {cat.toLowerCase()}> {Capitalise(cat)} </option>
+              ))}
+              </select>
+              
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <label className="font-semibold mb-1">Quantity</label>
+              <input
+                type="number"
+                name="quantity"
+                value={formData.quantity}
+                onChange={handleChange}
+                required
+                className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <label className="font-semibold mb-1">Re-Order Point</label>
+              <input
+                type="number"
+                name="reOrderPoint"
+                value={formData.reOrderPoint}
+                onChange={handleChange}
+                className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="bg-blue-600 text-white font-semibold rounded-lg px-4 py-2 hover:bg-blue-700 transition-colors mt-2 w-full"
+            >
+              Submit
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

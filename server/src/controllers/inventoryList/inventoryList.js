@@ -4,11 +4,39 @@ const InventoryProductsSchema = require("../../models/InventoryProducts/inventor
 const getInventoryProducts = async(req,res) => {
      try{
         const data = await InventoryProductsSchema.find();
-        return res.status(200).json({ success : true, data : data, message : "Data Retrieved Successfully"})
+        const count = await InventoryProductsSchema.countDocuments()
+        return res.status(200).json({ success : true, count : count, data : data, message : "Data Retrieved Successfully"})
      }catch(err){
         return res.status(500).json({ success : false, message : err.message})
      }
 }
 
 
-module.exports = getInventoryProducts;
+const addInventoryProducts = async(req,res) => {
+   try{
+      const { name, category, quantity, reOrderPoint } = req.body;
+
+      if( !name || !category || !reOrderPoint){
+         return res.status(400).json({ message : "Please, fill all required fields"});
+      }
+
+      const existingInventory = await InventoryProductsSchema.find({ name : name })
+
+      if(existingInventory.length > 0){
+         existingInventory.currentStock += quantity;
+         await existingInventory.save();
+         return res.status(200).json({ success : true, data : existingInventory, message : "Data updated successfully"})
+      }
+
+      const data = await new InventoryProductsSchema({ name, category, currentStock : quantity, reOrderPoint});
+      await data.save();
+      return res.status(200).json({ success : true, data : data, message : "Data Saved Successfully"})
+   }catch(err){
+      return res.status(500).json({ success : false, message : err.message })
+   }
+}
+
+
+module.exports = {
+   getInventoryProducts,
+   addInventoryProducts };

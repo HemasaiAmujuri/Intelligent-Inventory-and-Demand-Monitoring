@@ -2,10 +2,6 @@ const mongoose = require("mongoose");
 
 const InventoryProductsSchema = new mongoose.Schema(
   {
-    itemId: {
-      type: String,
-      required: true,
-    },
     name: {
       type: String,
       required: true,
@@ -13,16 +9,17 @@ const InventoryProductsSchema = new mongoose.Schema(
     category: {
       type: String,
       enum: [
-        "Electronics",
-        "Stationery",
-        "Groceries",
-        "Furniture",
-        "Clothing",
-        "Tools",
-        "Toys",
-        "Cosmetics",
-        "Sports",
-        "Other",
+        "electronics",
+        "stationery",
+        "groceries",
+        "furniture",
+        "clothing",
+        "tools",
+        "toys",
+        "cosmetics",
+        "sports",
+         "books",
+        "other"       
       ],
     },
     currentStock: {
