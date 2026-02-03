@@ -4,6 +4,7 @@ import Register from "./pages/register";
 import Login from "./pages/login";
 import Header from "./components/header";
 import Layout from "./components/layout";
+import Dashboard from "./pages/dashboard"
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route element={<Layout />}>
           <Route path="/inventoryList" element={<InventoryList />} />
+          <Route path="/dashboard" element={ <Dashboard />}/>
         </Route>
       </Routes>
     </Router>

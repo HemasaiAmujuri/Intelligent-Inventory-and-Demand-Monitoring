@@ -39,6 +39,22 @@ const addInventoryProducts = async(req,res) => {
 }
 
 
+const getCriticalInventoryAlerts = async(req,res) => {
+     try{
+        const data = await InventoryProductsSchema.find()
+        let criticalProducts = data.filter((item) => 
+           item.currentStock <= item.reOrderPoint
+      )
+        const count = criticalProducts.length;
+        return res.status(200).json({ success : true, count : count, data : criticalProducts, message: "Critical inventory alerts fetched successfully",})
+
+        }catch(err){
+         return res.status(500).json({ success : false , message : err.message})
+        }
+     };
+
+
 module.exports = {
    getInventoryProducts,
-   addInventoryProducts };
+   addInventoryProducts,
+   getCriticalInventoryAlerts };

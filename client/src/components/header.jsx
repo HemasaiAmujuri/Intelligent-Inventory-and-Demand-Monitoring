@@ -35,7 +35,7 @@ function Header() {
         <nav>
           <ul className="flex gap-20 font-medium text-white ml-150">
             <li className="hover:text-gray-200 cursor-pointer"><Link to="/inventoryList">Products</Link> </li>
-            <li className="hover:text-gray-200 cursor-pointer">Dashboard</li>
+            <li className="hover:text-gray-200 cursor-pointer"> <Link to="/dashboard">Dashboard</Link></li>
             <li className="hover:text-gray-200 cursor-pointer">Orders</li>
           </ul>
         </nav>
