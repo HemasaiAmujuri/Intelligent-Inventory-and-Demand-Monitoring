@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -10,6 +11,9 @@ function Register() {
     confirmPassword: "",
   });
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
    const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -24,57 +28,8 @@ function Register() {
     });
   };
 
-
-
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  // Password mismatch check
-  if (formData.password !== formData.confirmPassword) {
-    setMessage("Passwords do not match");
-
-    // Clear message and form after 3 seconds
-    setTimeout(() => {
-      setFormData({
-        name: "",
-        email: "",
-        mobile: "",
-        password: "",
-        confirmPassword: "",
-      });
-      setMessage("");
-    }, 3000);
-
-    return; // Stop further execution
-  }
-
-  // Prepare payload
-  const { confirmPassword, ...payLoad } = formData;
-
-  try {
-    const response = await fetch(`${baseURL}/api/user/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payLoad),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      // Success
-      setMessage(data.message || "Registration Successful");
-
-      // Navigate after 3 seconds
-      setTimeout(() => {
-        navigate("/inventoryList");
-      }, 3000);
-    } else {
-      // API returned an error (e.g., user exists)
-      setMessage(data.message || "Registration failed");
-
-      // Clear form & message after 3 seconds
-      setTimeout(() => {
-        setFormData({
+const resetForm = ()=> {
+         setFormData({
           name: "",
           email: "",
           mobile: "",
@@ -82,23 +37,55 @@ function Register() {
           confirmPassword: "",
         });
         setMessage("");
+      }
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (formData.password !== formData.confirmPassword) {   // checking password mismatches
+    setMessage("Passwords do not match");
+
+    // Clear message and form after 3 seconds
+    setTimeout(resetForm, 3000);
+
+    return;    //stop execution further
+  }
+
+ 
+  const { confirmPassword, ...payLoad } = formData;   //separate confirmPassword from form data
+
+  setLoading(true)
+
+  try {
+    const response = await fetch(`${baseURL}/api/user/register`, {    ///api integration
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payLoad),
+    });
+    
+    const data = await response.json();      //parse the response
+
+
+    if (response.ok) {
+      setMessage(data.message || "Registration Successful");   //display message
+
+      // Navigate after 3 seconds
+      setTimeout(() => {
+        navigate("/inventoryList");
       }, 3000);
+    } else {                                    //any api error
+      setMessage(data.message || "Registration failed");
+
+      // Clear form & message after 3 seconds
+      setTimeout(resetForm, 3000);
     }
   } catch (err) {
-    // Network or server error
+                                     // Network or server error
     setMessage(err.message || "Server failed");
 
     // Clear form & message after 3 seconds
-    setTimeout(() => {
-      setFormData({
-        name: "",
-        email: "",
-        mobile: "",
-        password: "",
-        confirmPassword: "",
-      });
-      setMessage("");
-    }, 3000);
+     setTimeout(resetForm, 3000);
+  }finally{
+    setLoading(false)
   }
 };
 
@@ -150,36 +137,47 @@ function Register() {
           />
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="relative flex flex-col gap-1">
           <label className="font-medium">Password</label>
           <input
-            type="password"
+            type= {showPassword ? "text" : "password"} 
             name="password"
+             title={showPassword ? "Hide password" : "Show password"}
             minLength={8}
             value={formData.password}
             onChange={handleChange}
             className="border rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-400"
             required
           />
+
+          <span  type="button" className="absolute bottom-3 right-4 cursor-pointer" onClick={(e) => setShowPassword(!showPassword)}>
+           {showPassword ? <FaEye /> : <FaEyeSlash />}
+          </span>
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="relative flex flex-col gap-1">
           <label className="font-medium">Confirm Password</label>
           <input
-            type="password"
+            type={ showConfirmPassword ? "text" : "password"}
             name="confirmPassword"
+            title={showConfirmPassword ? "Hide password" : "Show password"}
             value={formData.confirmPassword}
-            onChange={handleChange}
+           onChange={handleChange}
             className="border rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-400"
             required
           />
+
+          <span  type="button" className="absolute bottom-3 right-4 cursor-pointer" onClick={(e) => setShowConfirmPassword(!showConfirmPassword)}>
+           {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
+          </span>
         </div>
 
         <button
           type="submit"
           className="bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition"
+          disabled={loading}
         >
-          Submit
+          {loading ? "Submitting" : "Submit"}
         </button>
 
     <div className="w-full flex justify-end mt-2">
