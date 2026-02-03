@@ -117,7 +117,7 @@ function InventoryList() {
           <BsSearch className="absolute left-150 top-5" />
         </div>
 
-        <div className="flex justify-center items-center">
+        <div className="flex flex-col justify-center items-center">
           <table className="border border-gray-300">
             <thead className="bg-gray-100">
               <tr>
@@ -154,8 +154,8 @@ function InventoryList() {
                 </tr>
               ))}
             </tbody>
-
-            <div className="fixed flex justify-center items-center z-20 mt-10 ml-35">
+          </table>
+           <div className="flex justify-center items-center z-20 mt-10 ml-35">
               <div className="flex gap-2">
                 <button
                   onClick={() =>
@@ -192,7 +192,6 @@ function InventoryList() {
                 </button>
               </div>
             </div>
-          </table>
         </div>
         {showForm && (
           <form

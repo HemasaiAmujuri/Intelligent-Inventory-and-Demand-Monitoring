@@ -1,19 +1,21 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import InventoryList from './pages/inventoryList'
-import Register from './pages/register';
-import Login from'./pages/login'
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import InventoryList from "./pages/inventoryList";
+import Register from "./pages/register";
+import Login from "./pages/login";
+import Header from "./components/header";
+import Layout from "./components/layout";
 
 function App() {
   return (
     <Router>
-        <Routes>
-            <Route path="/" element={ <Login />} />
-            <Route path="/login" element={ <Login />} />
-            <Route path="/register" element={ <Register />} />
-            <Route path = "/inventoryList" element={ <InventoryList />}/>
-        </Routes>
-
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route element={<Layout />}>
+          <Route path="/inventoryList" element={<InventoryList />} />
+        </Route>
+      </Routes>
     </Router>
   );
 }
