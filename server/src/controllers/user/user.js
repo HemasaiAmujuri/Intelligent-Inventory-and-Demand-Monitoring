@@ -18,7 +18,7 @@ const registerController = async(req,res) => {
     }
     const user = await new userSchema(data);
     await user.save()
-    return res.status(200).json({ success : true , data : user, message : "Register Successfully"})
+    return res.status(201).json({ success : true , data : user, message : "Register Successfully"})
 }catch(err){
     console.log(err.message);
     return res.status(500).json({ success : false, message : err.message})

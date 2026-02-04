@@ -6,7 +6,7 @@ const orderSchema = new mongoose.Schema({
         type : String,
         required : true
     },
-    Category: {
+    category: {
       type: String,
       enum: [
         "electronics",
@@ -34,4 +34,4 @@ const orderSchema = new mongoose.Schema({
 
 
 
-module.exports = mongoose.model(orderSchema , orders)
+module.exports = mongoose.model( "orders", orderSchema )
