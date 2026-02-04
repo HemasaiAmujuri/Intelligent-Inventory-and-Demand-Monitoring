@@ -31,6 +31,10 @@ const InventoryProductsSchema = new mongoose.Schema(
       required: true,
       default : 5
     },
+      isDeleted : {
+      type : Boolean,
+      default : false
+    }
   },
   { timestamps: true },
 );
