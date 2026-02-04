@@ -10,6 +10,8 @@ function Order() {
       category : "",
       quantity : ""
   });
+  const [message,setMessage] = useState(" ");
+  const [productNames, setProductNames] = useState([])
 
 
    const handleChange = (e) => {
@@ -25,6 +27,22 @@ function Order() {
 
     fetchData();
   }, []);
+
+  useEffect(()=>{
+
+  },[]);
+
+
+  const handleSubmit = async() => {
+    try{
+        const response  = await fetch(`${baseUrl}/api/order/createOrder`);
+        const data = await response.json();
+        setMessage(data?.message  ?? "Data saved successfully")
+    }catch(err){
+        console.log(err);
+        setMessage(err.message ?? "server failed");
+    }
+  };
 
    const categories = [
     "electronics",
@@ -81,6 +99,7 @@ function Order() {
           <form
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
                  bg-white border border-gray-300 rounded-xl shadow-lg p-6 w-full max-w-md z-10"
+            onSubmit={()=> handleSubmit()}
           >
             <button
               type="button"

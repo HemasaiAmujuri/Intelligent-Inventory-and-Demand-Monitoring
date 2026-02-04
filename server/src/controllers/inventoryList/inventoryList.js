@@ -54,7 +54,23 @@ const getCriticalInventoryAlerts = async(req,res) => {
      };
 
 
+const getAllProductNames = async(req,res) => {
+     try{
+        const data = await InventoryProductsSchema.find();
+        const productNames = data.map((item) => {
+           return item.name;
+        });
+        console.log(productNames,"productNames")
+        const uniqueProductNames = [...new Set(productNames)];
+        return res.status(200).json({ success : true, data : uniqueProductNames, message : "Data Received Successfully"})
+     }catch(err){
+        return res.status(500).json({ success : false, message : err.message})
+     }
+}
+
+
 module.exports = {
    getInventoryProducts,
    addInventoryProducts,
-   getCriticalInventoryAlerts };
+   getCriticalInventoryAlerts,
+   getAllProductNames };
