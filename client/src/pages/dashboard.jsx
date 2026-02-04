@@ -23,18 +23,52 @@ function Dashboard() {
   }, []);
 
   return (
-    <div>
-      <h1 className="flex justify-center items-center font-bold text-3xl m-4">
-        Notifications
-      </h1>
-      <div className="border rounded-lg w-1/2 ml-120 flex flex-col">
-        {data.length === 0 ? ( <div className="flex justify-center items-center"> No Critical products </div> ) : (
-        data.map((item) =>(
-                <div className="text-xl bg-green-200 border rounded-lg gap-2 border-rounded-lg m-2 p-2"> {`${item.name} is running low. Current stock: ${item?.currentStock}. Please consider placing an order soon.`}</div>
-        )))}
-      </div>
+  <div className="min-h-screen bg-gray-50">
+    <h1 className="text-center font-bold text-3xl mb-6 mt-6 text-gray-800">
+      Notifications
+    </h1>
+
+    <div className="max-w-2xl mx-auto bg-white border rounded-xl shadow-md p-4">
+      {data.length === 0 ? (
+        <div className="flex justify-center items-center text-gray-500 py-10">
+          🎉 No critical products
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto">
+          {data.map((item) => {
+            const isOutOfStock = item.currentStock === 0;
+
+            return (
+              <div
+                key={item.id}
+                className={`flex items-start gap-4 p-4 rounded-lg border ${
+                  isOutOfStock
+                    ? "bg-red-100 border-red-500"
+                    : "bg-yellow-100 border-yellow-500"
+                }`}
+              >
+                <span className="text-2xl">
+                  {isOutOfStock ? "🚨" : "⚠️"}
+                </span>
+
+                <div>
+                  <p className="font-semibold text-gray-800">
+                    {item.name}
+                  </p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {isOutOfStock
+                      ? "Out of stock. Please reorder immediately."
+                      : `Running low. Current stock: ${item.currentStock}. Please plan a reorder soon to avoid stockout`}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
-  );
+  </div>
+);
 }
 
 export default Dashboard;
