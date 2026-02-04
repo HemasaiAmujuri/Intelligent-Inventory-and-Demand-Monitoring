@@ -2,9 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import InventoryList from "./pages/inventoryList";
 import Register from "./pages/register";
 import Login from "./pages/login";
-import Header from "./components/header";
 import Layout from "./components/layout";
-import Dashboard from "./pages/dashboard"
+import Dashboard from "./pages/dashboard";
+import Order from "./pages/order"
 
 function App() {
   return (
@@ -16,6 +16,7 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/inventoryList" element={<InventoryList />} />
           <Route path="/dashboard" element={ <Dashboard />}/>
+          <Route path="/order" element={ <Order />} />
         </Route>
       </Routes>
     </Router>
