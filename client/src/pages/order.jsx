@@ -118,7 +118,13 @@ function Order() {
           </div>
           <div className="flex justify-end">
              <button className="flex justify-center items center p-2 bg-blue-500 border rounded-lg w-30" 
-              onClick={() => setShowForm(true)}>
+              onClick={() => {setShowForm(true);
+                 setFormData({
+                  productName : item?.name,
+                  category : item?.category.toLowerCase(),
+                  quantity : item?.currentStock
+                 })}
+              }>
                 Create Order
           </button>
             </div>
