@@ -95,7 +95,8 @@ function Order() {
 
   return (
     <div>
-  <div className="flex justify-center items-center flex-wrap m-8 mt-15 gap-12 border rounded-lg px-5 py-5 pt-15 max-h-[500px] overflow-y-auto">
+      <h1 className="font-bold text-5xl flex justify-center items center mt-5"> Place Order For Customers </h1>
+  <div className="flex justify-center items-center flex-wrap m-8 mt-10 gap-12 border rounded-lg px-5 py-5 pt-15 max-h-[500px] overflow-y-auto">
     {currentItems
       .filter(item => item.currentStock > 0)
       .map((item, index) => (

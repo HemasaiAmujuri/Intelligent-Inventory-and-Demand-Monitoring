@@ -29,7 +29,7 @@ function Header() {
   };
 
   return (
-    <header className="w-full bg-blue-600 text-white">
+    <header className="w-full bg-blue-500 text-white">
       <div className="flex justify-between items-center p-4">
         {/* Navigation */}
         <nav>

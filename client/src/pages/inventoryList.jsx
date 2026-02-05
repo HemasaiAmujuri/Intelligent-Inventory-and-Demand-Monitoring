@@ -94,7 +94,7 @@ function InventoryList() {
 
   return (
     <div className="relative">
-      <div className="flex-col justify-between items-center mb-8">
+      <div className="flex-col justify-between items-center">
         <div className="flex items-center justify-between mt-10 mb-5 ml-150">
           <h1 className="text-5xl font-bold">Inventory List</h1>
 
@@ -106,19 +106,19 @@ function InventoryList() {
           </button>
         </div>
 
-        <div className="relative">
+        <div className="relative fixed">
           <input
             type="text"
             placeholder="search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="outline-none border rounded-lg bg-gray-200 ml-108 mt-3 mb-2 p-1 "
+            className="outline-none border rounded-lg bg-gray-200 ml-105 mt-3 mb-2 p-1"
           />
-          <BsSearch className="absolute left-150 top-5" />
+          <BsSearch className="absolute left-145 top-5" />
         </div>
 
         <div className="flex flex-col justify-center items-center">
-          <table className="border border-gray-300">
+          <table className="border border-gray-300 w-[750px]">
             <thead className="bg-gray-100">
               <tr>
                 <th className="border px-4 py-2">S.NO</th>

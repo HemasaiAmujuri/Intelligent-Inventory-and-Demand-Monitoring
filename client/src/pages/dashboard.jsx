@@ -23,7 +23,7 @@ function Dashboard() {
   }, []);
 
   return (
-  <div className="min-h-screen bg-gray-50">
+  <div className="bg-gray-50 mb-10">
     <h1 className="text-center font-bold text-3xl mb-6 mt-6 text-gray-800">
       Notifications
     </h1>
