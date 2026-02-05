@@ -91,7 +91,6 @@ function InventoryList() {
 
   if (search.length >= 3) {
     currentItems = currentItems.filter((user) => {
-      console.log(user.name, "name");
       return user.name.toLowerCase().includes(search.toLowerCase());
     });
   }

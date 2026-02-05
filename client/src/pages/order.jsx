@@ -48,28 +48,41 @@ function Order() {
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
 
-  const handleSubmit = async(e) => {
-      e.preventDefault();
-    try{
-        const response  = await fetch(`${baseUrl}/api/order/createOrder`,{
-           method : "POST",
-           headers : {
-            "Content-Type" : "application/json",
-           }, 
-            body: JSON.stringify(formData),
-        });
-        const data = await response.json();
-        setMessage(data?.message  ?? "Data saved successfully")
-        setShowForm(false);
-        if(data?.success){
-          fetchData();
-        }
-    }catch(err){
-        console.log(err);
-        setMessage(err.message ?? "server failed");
-        setShowForm(false);
+   
+
+   const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await fetch(`${baseUrl}/api/order/createOrder`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    // show message
+    setMessage(data?.message ?? "Data saved successfully");
+
+    // hide form if success
+    setShowForm(!data?.success ? true : false);
+
+    if (data?.success) {
+      fetchData(); // refresh data
     }
-  };
+
+    // clear message after 3 seconds
+    setTimeout(() => setMessage(""), 3000);
+
+  } catch (err) {
+    console.log(err);
+    setMessage(err.message ?? "Server failed");
+    setShowForm(true);
+    setTimeout(() => setMessage(""), 3000);
+  }
+};
+
+
 
    const categories = [
     "electronics",
@@ -204,6 +217,11 @@ function Order() {
             >
               Submit
             </button>
+            {message && (
+        <p className="text-sm text-center bg-blue-200 border rounded-lg p-2">
+          {message}
+        </p>
+      )}
           </form>
         )}
   </div>
