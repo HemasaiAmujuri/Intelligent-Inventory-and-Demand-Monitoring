@@ -67,7 +67,7 @@ function Register() {
 
       if (response.ok) {
         setMessage(data.message || "Registration Successful"); //display message
-
+        localStorage.setItem("name", data?.data?.name)
         // Navigate after 3 seconds
         setTimeout(() => {
           navigate("/inventoryList");

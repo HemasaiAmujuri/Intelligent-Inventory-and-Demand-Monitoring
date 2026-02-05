@@ -9,7 +9,7 @@ function Header() {
   const navigate = useNavigate();
 
   const userName = localStorage.getItem("name") ?? "John Doe";
-  const firstName = userName.split(" ")[0];
+  const firstName = Capitalise(userName.split(" ")[0]);
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -27,6 +27,13 @@ function Header() {
     localStorage.removeItem("name");
     navigate("/login")
   };
+
+
+  function Capitalise(word){
+    if(!word){
+      return " "
+    }return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  }
 
   return (
     <header className="w-full bg-blue-500 text-white">
@@ -47,12 +54,12 @@ function Header() {
             className="flex items-center gap-2 text-white font-medium hover:text-gray-200 transition-colors"
           >
             <FaUser className="text-lg" />
-            <span>{firstName}</span>
+            <span>{Capitalise(firstName)}</span>
           </button>
 
           {open && (
             <div className="absolute right-1 mt-2 w-48 bg-white text-gray-700 rounded-md shadow-lg z-50 overflow-hidden">
-              <div className="px-4 py-2 border-b font-medium">{userName}</div>
+              <div className="px-4 py-2 border-b font-medium">{Capitalise(firstName)}</div>
               <button
                 onClick={handleLogout}
                 className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 transition-colors"

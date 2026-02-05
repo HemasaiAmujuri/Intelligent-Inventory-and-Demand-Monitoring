@@ -35,6 +35,7 @@ function Login() {
 
       if (response.ok) {
         setMessage(data.message || "Login Successful"); //display message
+        localStorage.setItem("name", data?.data?.name)
 
         // Navigate after 3 seconds
         setTimeout(() => {
