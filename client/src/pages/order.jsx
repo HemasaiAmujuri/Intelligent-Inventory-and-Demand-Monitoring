@@ -11,7 +11,10 @@ function Order() {
       quantity : ""
   });
   const [message,setMessage] = useState(" ");
-  const [productNames, setProductNames] = useState([])
+  const [productNames, setProductNames] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10
+
 
 
    const handleChange = (e) => {
@@ -36,6 +39,13 @@ function Order() {
         }
         fetchProductNames()
   },[]);
+
+  const filteredItems = data.filter(item => item.currentStock > 0); 
+
+  const indexOfLastItem = currentPage*itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem-itemsPerPage;
+  let currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem)
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
 
   const handleSubmit = async(e) => {
@@ -84,13 +94,14 @@ function Order() {
   }
 
   return (
+    <div>
   <div className="flex justify-center items-center flex-wrap m-8 mt-15 gap-12 border rounded-lg px-5 py-5 pt-15 max-h-[500px] overflow-y-auto">
-    {data
+    {currentItems
       .filter(item => item.currentStock > 0)
       .map((item, index) => (
         <div
           key={index}
-          className="flex flex-col p-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg transition-shadow duration-400 gap-2 w-55 bg-gray-500"
+          className="flex flex-col p-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg duration-400 gap-2 w-60 bg-gray-500"
         >
           <div className="flex gap-2">
             <span className="font-bold">Name:</span>
@@ -189,6 +200,45 @@ function Order() {
           </form>
         )}
   </div>
+    <div className="flex justify-center items-center z-20 mt-10 ml-35">
+              <div className="flex gap-2">
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 border rounded disabled:opacity-50"
+                >
+                  Prev
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-3 py-1 border rounded ${
+                        page === currentPage ? "bg-blue-600 text-white" : ""
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ),
+                )}
+
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 border rounded disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+  </div>
+  
 );
 }
 
