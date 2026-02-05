@@ -36,6 +36,9 @@ function InventoryList() {
   };
 
   const handleSubmit = async (e) => {
+    const { name, ...payLoad } = formData;
+    const capitalisedName = Capitalise(name.trim());
+
     e.preventDefault();
     try {
       const response = await fetch(`${baseURL}/api/inventory/addInventory`, {
@@ -43,7 +46,7 @@ function InventoryList() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ name: capitalisedName, ...payLoad }),
       });
       if (response.ok) {
         setFormData({
@@ -52,6 +55,7 @@ function InventoryList() {
           quantity: "",
           reOrderPoint: "",
         });
+        setShowForm(false);
       }
     } catch (err) {
       console.log(err);
@@ -155,43 +159,41 @@ function InventoryList() {
               ))}
             </tbody>
           </table>
-           <div className="flex justify-center items-center z-20 mt-10 ml-35">
-              <div className="flex gap-2">
-                <button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  disabled={currentPage === 1}
-                  className="px-3 py-1 border rounded disabled:opacity-50"
-                >
-                  Prev
-                </button>
+          <div className="flex justify-center items-center z-20 mt-10 ml-35">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+              >
+                Prev
+              </button>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`px-3 py-1 border rounded ${
-                        page === currentPage ? "bg-blue-600 text-white" : ""
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ),
-                )}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-1 border rounded ${
+                      page === currentPage ? "bg-blue-600 text-white" : ""
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ),
+              )}
 
-                <button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="px-3 py-1 border rounded disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+              >
+                Next
+              </button>
             </div>
+          </div>
         </div>
         {showForm && (
           <form
@@ -201,7 +203,15 @@ function InventoryList() {
           >
             <button
               type="button"
-              onClick={() => setShowForm(false)}
+              onClick={() => {
+                setShowForm(false);
+                setFormData({
+                  name: "",
+                  category: "",
+                  quantity: 0,
+                  reOrderPoint: 0,
+                });
+              }}
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 font-bold text-xl"
             >
               ×
@@ -216,7 +226,7 @@ function InventoryList() {
               <input
                 type="text"
                 name="name"
-                value={Capitalise(formData?.name)}
+                value={formData?.name}
                 onChange={handleChange}
                 required
                 className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
