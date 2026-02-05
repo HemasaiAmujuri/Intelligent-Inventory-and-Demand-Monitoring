@@ -43,7 +43,7 @@ const getCriticalInventoryAlerts = async(req,res) => {
      try{
         const data = await InventoryProductsSchema.find()
         let criticalProducts = data.filter((item) => 
-           item.currentStock <= item.reOrderPoint
+           item.currentStock < item.reOrderPoint
       )
         const count = criticalProducts.length;
         return res.status(200).json({ success : true, count : count, data : criticalProducts, message: "Critical inventory alerts fetched successfully",})
@@ -60,7 +60,6 @@ const getAllProductNames = async(req,res) => {
         const productNames = data.map((item) => {
            return item.name;
         });
-        console.log(productNames,"productNames")
         const uniqueProductNames = [...new Set(productNames)];
         return res.status(200).json({ success : true, data : uniqueProductNames, message : "Data Received Successfully"})
      }catch(err){

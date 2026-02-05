@@ -21,6 +21,7 @@ const orderSchema = new mongoose.Schema({
          "books",
         "other"       
       ],
+       set: (v) => v?.trim().toLowerCase(),
     },
     quantity : {
         type : Number,
@@ -29,7 +30,7 @@ const orderSchema = new mongoose.Schema({
     isDeleted : {
         type : Boolean,
         default : false
-    }
+    },
 }, { timeStamps : true});
 
 

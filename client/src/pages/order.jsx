@@ -6,7 +6,7 @@ function Order() {
   const [data, setData] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-      name : "",
+      productName : "",
       category : "",
       quantity : ""
   });
@@ -18,29 +18,46 @@ function Order() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };    
 
-  useEffect(() => {
     const fetchData = async () => {
       const response = await fetch(`${baseUrl}/api/inventory/inventoryList`);
       const data = await response.json(); // parse the response
       setData(data.data);
     };
 
-    fetchData();
+  useEffect(() => {
+      fetchData();
   }, []);
 
   useEffect(()=>{
-
+        const fetchProductNames = async () => {
+          const response = await fetch(`${baseUrl}/api/inventory/getAllProductNames`);
+          const data = await response.json();
+          setProductNames(data.data)
+        }
+        fetchProductNames()
   },[]);
 
 
-  const handleSubmit = async() => {
+  const handleSubmit = async(e) => {
+      e.preventDefault();
     try{
-        const response  = await fetch(`${baseUrl}/api/order/createOrder`);
+        const response  = await fetch(`${baseUrl}/api/order/createOrder`,{
+           method : "POST",
+           headers : {
+            "Content-Type" : "application/json",
+           }, 
+            body: JSON.stringify(formData),
+        });
         const data = await response.json();
         setMessage(data?.message  ?? "Data saved successfully")
+        setShowForm(false);
+        if(data?.success){
+          fetchData();
+        }
     }catch(err){
         console.log(err);
         setMessage(err.message ?? "server failed");
+        setShowForm(false);
     }
   };
 
@@ -99,7 +116,7 @@ function Order() {
           <form
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
                  bg-white border border-gray-300 rounded-xl shadow-lg p-6 w-full max-w-md z-10"
-            onSubmit={()=> handleSubmit()}
+            onSubmit={handleSubmit}
           >
             <button
               type="button"
@@ -115,14 +132,21 @@ function Order() {
 
             <div className="flex flex-col mb-2">
               <label className="font-semibold mb-1">Product Name</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
+              <select
+                name="productName"
+                value={formData.productName}
                 onChange={handleChange}
                 required
-                className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
+                className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 "
+              >
+                <option> Select Category </option>
+                {productNames.map((cat, index) => (
+                  <option key={index} value={cat}>
+                    {" "}
+                    {Capitalise(cat)}{" "}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="flex flex-col mb-2">

@@ -216,7 +216,7 @@ function InventoryList() {
               <input
                 type="text"
                 name="name"
-                value={formData.name}
+                value={Capitalise(formData?.name)}
                 onChange={handleChange}
                 required
                 className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
