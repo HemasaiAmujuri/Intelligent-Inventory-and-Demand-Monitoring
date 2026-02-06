@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function Register() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({    //initiate state for form data
     name: "",
     email: "",
     mobile: "",
@@ -15,7 +15,7 @@ function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const baseURL = import.meta.env.VITE_BASE_URL;
+  const baseURL = import.meta.env.VITE_BASE_URL;   // get host url from env
 
   const navigate = useNavigate();
 
@@ -40,7 +40,7 @@ function Register() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault();   // it prevents browser default behaviour when form submit (prevent page refresh)
     if (formData.password !== formData.confirmPassword) {
       // checking password mismatches
       setMessage("Passwords do not match");
@@ -51,7 +51,7 @@ function Register() {
       return; //stop execution further
     }
 
-    const { confirmPassword, ...payLoad } = formData; //separate confirmPassword from form data
+    const { confirmPassword, ...payLoad } = formData; //separate confirmPassword from form data not sent confirmPassword to api
 
     setLoading(true);
 
@@ -85,8 +85,8 @@ function Register() {
 
       // Clear form & message after 3 seconds
       setTimeout(resetForm, 3000);
-    } finally {
-      setLoading(false);
+    } finally {     //it executes irrespectice of success and failure
+      setLoading(false); 
     }
   };
 
@@ -185,7 +185,7 @@ function Register() {
           className="bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition"
           disabled={loading}
         >
-          {loading ? "Submitting" : "Submit"}
+          {loading ? "Submitting" : "Submit"}   // based on loading state
         </button>
 
         <div className="w-full flex justify-end mt-2">
@@ -198,7 +198,7 @@ function Register() {
         </div>
       </form>
 
-      {message && (
+      {message && (   // message UI 
         <p className="text-sm text-center bg-blue-200 border rounded-lg p-2">
           {message}
         </p>
