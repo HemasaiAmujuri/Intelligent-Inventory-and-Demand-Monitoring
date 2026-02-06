@@ -12,7 +12,7 @@ const createOrder = async (req, res) => {
     // Find product in inventory
     const productExist = await inventorySchema.findOne({ name: data.productName });
 
-    if (!productExist) {
+    if (!productExist) {   //check product exist or not
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
@@ -26,19 +26,19 @@ const createOrder = async (req, res) => {
 
     // Reduce stock
     productExist.currentStock -= Number(data.quantity);
-    await productExist.save();
+    await productExist.save();  //update details with existing product
 
     // Create order only after stock validation
     const newOrder = new orderSchema(data);
-    await newOrder.save();
+    await newOrder.save();   //create new document if not existing products
 
-    return res.status(201).json({
-      success: true,
+    return res.status(201).json({               //true block
+      success: true, 
       data: newOrder,
       message: "Order placed successfully",
     });
 
-  } catch (err) {
+  } catch (err) {                  //false block
     return res.status(500).json({ success: false, message: err.message });
   }
 };

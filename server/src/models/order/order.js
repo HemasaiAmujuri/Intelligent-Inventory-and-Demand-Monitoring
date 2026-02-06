@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-
+                                                  // schema for when creating orders
 const orderSchema = new mongoose.Schema({
     productName : {
         type : String,
@@ -21,13 +21,12 @@ const orderSchema = new mongoose.Schema({
          "books",
         "other"       
       ],
-       set: (v) => v?.trim().toLowerCase(),
     },
     quantity : {
         type : Number,
         required : true
     },
-    isDeleted : {
+    isDeleted : {             // for soft delete 
         type : Boolean,
         default : false
     },

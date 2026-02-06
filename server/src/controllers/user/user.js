@@ -1,7 +1,7 @@
 const express = require("express");
-const userSchema = require("../../models/user/user")
+const userSchema = require("../../models/user/user");
 const bcrypt = require("bcrypt")
-const saltRounds = 10;
+const saltRounds = 10;  //bcrypt will run 2¹⁰ = 1024 rounds  and recommended way is 10 0r 12 incresing salt rounds lead to increse time complexity
 
 const registerController = async(req,res) => {
     try{
@@ -13,15 +13,15 @@ const registerController = async(req,res) => {
         return res.status(409).json({ success : true, message : "User already exist, Please Login"})
     }
     if(data.password){
-       const hashedPassword = await bcrypt.hash(data?.password, saltRounds)
+       const hashedPassword = await bcrypt.hash(data?.password, saltRounds)   //here algorith runs 2^10 to hash the password
        data.password = hashedPassword;
     }
     const user = await new userSchema(data);
-    await user.save()
-    return res.status(201).json({ success : true , data : user, message : "Register Successfully"})
+    await user.save();     //here data saved in DB without this data is not saved in db
+    return res.status(201).json({ success : true , data : user, message : "Register Successfully"})   //true response
 }catch(err){
     console.log(err.message);
-    return res.status(500).json({ success : false, message : err.message})
+    return res.status(500).json({ success : false, message : err.message})  //false response
 }
 }
 
@@ -35,7 +35,7 @@ const loginController = async(req,res) => {
         if(!user){
             return res.status(404).json({ success : false, message : "User not found"})
         }
-        const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = await bcrypt.compare(password, user.password);   //compare passwords matching
         if(!isMatch){
             return res.status(404).json({ success : false, message : "Invalid Credentials"})
         }

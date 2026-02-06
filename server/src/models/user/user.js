@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    isDeleted : {
+    isDeleted : {                 // for soft delete user
       type : Boolean,
       default : false
     }

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require("mongoose");      // schema for Inventory products
 
 const InventoryProductsSchema = new mongoose.Schema(
   {
@@ -31,7 +31,7 @@ const InventoryProductsSchema = new mongoose.Schema(
       required: true,
       default : 5
     },
-      isDeleted : {
+      isDeleted : {         // for soft delete
       type : Boolean,
       default : false
     }
