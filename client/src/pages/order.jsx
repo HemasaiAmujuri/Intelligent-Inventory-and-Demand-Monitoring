@@ -11,7 +11,7 @@ function Order() {
       category : "",
       quantity : ""
   });
-  const [message,setMessage] = useState(" ");
+  const [message,setMessage] = useState("");
   const [productNames, setProductNames] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
