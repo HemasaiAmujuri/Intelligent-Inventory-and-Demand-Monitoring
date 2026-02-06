@@ -8,7 +8,7 @@ function Header() {
 
   const navigate = useNavigate();
 
-  const userName = localStorage.getItem("name") ?? "John Doe";
+  const userName = localStorage.getItem("name") ?? "John Doe";   // get name from localstorage
   const firstName = Capitalise(userName.split(" ")[0]);
 
   // Close dropdown if clicked outside
@@ -19,11 +19,13 @@ function Header() {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);  //This is the cleanup function in useEffect. It removes the event listener when the component unmounts to prevent memory leaks or multiple listeners stacking up.
+
+
   }, []);
 
   // Logout function
-  const handleLogout = () => {
+  const handleLogout = () => {    //REGIRECT TO LOGIN PAGE
     localStorage.removeItem("name");
     navigate("/login")
   };
@@ -57,7 +59,7 @@ function Header() {
             <span>{Capitalise(firstName)}</span>
           </button>
 
-          {open && (
+          {open && (     // THIS EXECTUTE WHEN OPEN IS TRUE
             <div className="absolute right-1 mt-2 w-48 bg-white text-gray-700 rounded-md shadow-lg z-50 overflow-hidden">
               <div className="px-4 py-2 border-b font-medium">{Capitalise(firstName)}</div>
               <button

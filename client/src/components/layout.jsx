@@ -6,7 +6,7 @@ import App from "../app";
 export default function Layout() {
   return (
     <>
-      <Header />
+      <Header />       // follows this layout across all pages in the application except login and signUp
       <main>
         <Outlet>
           <App />
