@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-
-const baseURL = import.meta.env.VITE_BASE_URL;
+                                                      
+const baseURL = import.meta.env.VITE_BASE_URL;  
 
 function Dashboard() {
   const [data, setData] = useState([]);
 
-  useEffect(() => {
+  useEffect(() => {    // api integration
     const fetchData = async (req, res) => {
       try {
         const response = await fetch(
@@ -19,8 +19,8 @@ function Dashboard() {
       }
     };
 
-    fetchData();
-  }, []);
+    fetchData();  
+  }, []);    // load api eveny mounting
 
   return (
   <div className="bg-gray-50 mb-10">
@@ -36,7 +36,8 @@ function Dashboard() {
       ) : (
         <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto">
           {data.map((item) => {
-            const isOutOfStock = item.currentStock === 0;
+                                                                    // check isOutOfStock or not
+            const isOutOfStock = item.currentStock === 0; 
 
             return (
               <div

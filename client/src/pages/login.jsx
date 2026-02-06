@@ -110,8 +110,9 @@ function Login() {
           type="submit"
           className="bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition"
           disabled={loading}
-        >
-          {loading ? "Submitting" : "Submit"}  // BASED ON LOADING
+        >   
+                                                           {/* // BASED ON LOADING */}
+          {loading ? "Submitting" : "Submit"}  
         </button>
 
         <div className="w-full flex justify-end mt-2">
