@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { BsSearch } from "react-icons/bs";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -13,6 +14,7 @@ function Order() {
   const [message,setMessage] = useState(" ");
   const [productNames, setProductNames] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState("");
   const itemsPerPage = 10
 
 
@@ -106,10 +108,28 @@ function Order() {
         return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
   }
 
+
+    if (search.length >= 3) {
+    currentItems = currentItems.filter((user) => {
+      return user.name.toLowerCase().includes(search.toLowerCase());
+    });
+  }
+
   return (
     <div>
       <h1 className="font-bold text-5xl flex justify-center items center mt-5"> Place Order For Customers </h1>
-  <div className="flex justify-center items-center flex-wrap m-8 mt-10 gap-12 border rounded-lg px-5 py-5 pt-15 max-h-[500px] overflow-y-auto">
+      <div className="relative">
+          <input
+            type="text"
+            placeholder="search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="outline-none border  rounded-2xl mt-3 p-2 ml-5"
+
+          />
+          <BsSearch className="absolute left-47 top-6" />
+        </div>
+  <div className="flex justify-center items-center flex-wrap m-5 gap-12 border rounded-lg px-5 py-5 pt-15 max-h-[500px] overflow-y-auto">
     {currentItems
       .filter(item => item.currentStock > 0)
       .map((item, index) => (
