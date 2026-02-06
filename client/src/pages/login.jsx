@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { IoIosLock } from "react-icons/io";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -65,6 +66,9 @@ function Login() {
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg flex flex-col gap-5"
       >
+          <div className="flex justify-center items-center">
+            <IoIosLock className="w-30 h-30 text-blue-500" />
+          </div>
         <h1 className="text-2xl font-bold text-center"> Login </h1>
 
         <div className="flex flex-col gap-1">
