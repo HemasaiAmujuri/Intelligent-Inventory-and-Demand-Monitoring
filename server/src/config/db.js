@@ -12,7 +12,7 @@ const dbUri = `mongodb+srv://${userName}:${password}@questions.e2ai2cz.mongodb.n
 
 
 
-const configDB = async() => {
+const configDB = async() => {     // try-catch is used to handle DB connection errors such as server down, wrong credentials, wrong port, or network issues
     try{
     await mongoose.connect(dbUri)
     console.log("connected Database")
