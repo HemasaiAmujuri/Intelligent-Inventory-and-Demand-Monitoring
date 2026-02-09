@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { FaUser } from "react-icons/fa";
 import { useNavigate, Link } from 'react-router-dom'
 import Capitalise from "../utils/utils";
+import * as jwt_decode from "jwt-decode"
 
 function Header() {
   const [open, setOpen] = useState(false);
@@ -9,8 +10,18 @@ function Header() {
 
   const navigate = useNavigate();
 
-  const userName = localStorage.getItem("name") ?? "John Doe";   // get name from localstorage
-  const firstName = Capitalise(userName.split(" ")[0]);
+  const token = localStorage.getItem("token")
+
+  console.log(token,"token");
+
+  let firstName = ""
+  if(token){
+    const data = jwt_decode.default(token); 
+    console.log(data,"data");
+    const userName = data?.name ?? "John Doe"    // get the name from token
+    firstName = Capitalise(userName.split(" ")[0]);
+  }
+
 
   // Close dropdown if clicked outside
   useEffect(() => {

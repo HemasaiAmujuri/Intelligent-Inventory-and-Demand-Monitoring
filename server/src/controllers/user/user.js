@@ -2,6 +2,12 @@ const express = require("express");
 const userSchema = require("../../models/user/user");
 const bcrypt = require("bcrypt");
 const saltRounds = 10; //bcrypt will run 2¹⁰ = 1024 rounds  and recommended way is 10 0r 12 incresing salt rounds lead to increse time complexity
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config()
+
+const secretKey = process.env.SECRETKEY;
+
 
 const registerController = async (req, res) => {
   try {
@@ -40,7 +46,6 @@ const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -62,11 +67,16 @@ const loginController = async (req, res) => {
         .json({ success: false, message: "Invalid Credentials" });
     }
 
-    const userData = user.toObject();
-    delete userData.password; //delete password from response
+    const payload = {
+      id: user._id,
+      name: user.name,
+    };
+
+    const token = jwt.sign(payload, secretKey);
+  
     return res
       .status(200)
-      .json({ success: true, data: userData, message: "Login Successful" });
+      .json({ success: true, token: token, message: "Login Successful" });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
