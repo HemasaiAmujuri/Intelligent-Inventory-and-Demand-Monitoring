@@ -10,13 +10,13 @@ const registerController = async(req,res) => {
     const existingUser = await userSchema.findOne({ email : data.email});
 
     if(existingUser){
-        return res.status(409).json({ success : true, message : "User already exist, Please Login"})
+        return res.status(409).json({ success : false, message : "User already exist, Please Login"})
     }
     if(data.password){
        const hashedPassword = await bcrypt.hash(data?.password, saltRounds)   //here algorith runs 2^10 to hash the password
        data.password = hashedPassword;
     }
-    const user = await new userSchema(data);
+    const user = new userSchema(data);
     await user.save();     //here data saved in DB without this data is not saved in db
     return res.status(201).json({ success : true , data : user, message : "Register Successfully"})   //true response
 }catch(err){
@@ -37,9 +37,12 @@ const loginController = async(req,res) => {
         }
         const isMatch = await bcrypt.compare(password, user.password);   //compare passwords matching
         if(!isMatch){
-            return res.status(404).json({ success : false, message : "Invalid Credentials"})
+            return res.status(401).json({ success : false, message : "Invalid Credentials"})
         }
-        return res.status(200).json({ success : true, data : user, message : "Login Successful"})
+
+        const userData = user.toObject();
+        delete userData.password;  //delete password from response
+        return res.status(200).json({ success : true, data : userData, message : "Login Successful"})
     }catch(err){
         return res.status(500).json({ success : false, message : err.message})
     }
