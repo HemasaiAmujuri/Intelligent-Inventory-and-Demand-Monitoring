@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { BsSearch } from "react-icons/bs";
+import Capitalise from "../utils/utils";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -16,7 +17,7 @@ function InventoryList() {
   const [search, setSearch] = useState("");
   const itemsPerPage = 12;
 
-  useEffect(() => {
+
     const fetchData = async () => {
       try {
         const response = await fetch(`${baseURL}/api/inventory/inventoryList`);
@@ -28,8 +29,11 @@ function InventoryList() {
       }
     };
 
+  useEffect(() => {
+  
+
     fetchData();
-  }, [formData]);
+  },[]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -56,6 +60,7 @@ function InventoryList() {
           reOrderPoint: "",
         });
         setShowForm(false);
+        fetchData();
       }
     } catch (err) {
       console.log(err);
@@ -81,13 +86,6 @@ function InventoryList() {
     "books",
     "other",
   ];
-
-  function Capitalise(word) {
-    if (!word) {
-      return " ";
-    }
-    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-  }
 
   if (search.length >= 3) {
     currentItems = currentItems.filter((user) => {
