@@ -4,7 +4,12 @@ const mongoose = require("mongoose");
 const orderSchema = new mongoose.Schema({
     productName : {
         type : String,
+        ref: "inventoryProducts",
         required : true
+    },
+    orderedBy : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : "users"
     },
     category: {
       type: String,
@@ -24,12 +29,18 @@ const orderSchema = new mongoose.Schema({
     },
     quantity : {
         type : Number,
-        required : true
+        required : true,
+        min:1
     },
     isDeleted : {             // for soft delete 
         type : Boolean,
         default : false
     },
+    status: {
+  type: String,
+  enum: ["pending", "confirmed", "cancelled", "delivered"],
+  default: "confirmed"
+}
 }, { timestamps : true});
 
 

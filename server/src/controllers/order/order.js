@@ -5,6 +5,14 @@ const createOrder = async (req, res) => {
   try {
     const data = req.body;
 
+    if (!data.quantity || isNaN(data.quantity) || data.quantity <= 0) {
+  return res.status(400).json({
+    success: false,
+    message: "Valid quantity is required"
+  });
+}
+
+
     if (!data?.productName) {
       return res.status(400).json({ success: false, message: "Product name is required" });
     }
@@ -24,14 +32,18 @@ const createOrder = async (req, res) => {
       });
     }
 
-    // Reduce stock
-    productExist.currentStock -= Number(data.quantity);
-    await productExist.save();  //update details with existing product
-
-    // Create order only after stock validation
+     // Create order only after stock validation
     const newOrder = new orderSchema(data);
-    await newOrder.save();   //create new document if not existing products
+    const savedOrder = await newOrder.save();   //create new document if not existing products
 
+    // Reduce stock
+    if(savedOrder){
+       productExist.currentStock -= Number(data.quantity);
+       await productExist.save();  //update details with existing product
+    }
+    
+
+   
     return res.status(201).json({               //true block
       success: true, 
       data: newOrder,
