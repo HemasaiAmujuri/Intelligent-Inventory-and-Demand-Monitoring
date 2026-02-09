@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { FaUser } from "react-icons/fa";
 import { useNavigate, Link } from 'react-router-dom'
+import Capitalise from "../utils/utils";
 
 function Header() {
   const [open, setOpen] = useState(false);
@@ -29,13 +30,6 @@ function Header() {
     localStorage.removeItem("name");
     navigate("/login")
   };
-
-
-  function Capitalise(word){
-    if(!word){
-      return " "
-    }return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-  }
 
   return (
     <header className="w-full bg-blue-500 text-white">

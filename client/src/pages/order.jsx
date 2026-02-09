@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { BsSearch } from "react-icons/bs";
+import Capitalise from "../utils/utils";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -99,14 +100,6 @@ function Order() {
     "books",
     "other",
   ];
-
-
-  function Capitalise(word){
-    if(!word){
-        return ""
-    }
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-  }
 
 
     if (search.length >= 3) {
