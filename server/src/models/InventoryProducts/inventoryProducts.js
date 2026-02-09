@@ -28,7 +28,6 @@ const InventoryProductsSchema = new mongoose.Schema(
     },
     reOrderPoint: {
       type: Number,
-      required: true,
       default : 5
     },
       isDeleted : {         // for soft delete
