@@ -6,13 +6,42 @@ import Capitalise from "../utils/utils";
 function Header() {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const [name, setName] = useState("");
 
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("token")
+  const baseUrl = import.meta.env.VITE_BASE_URL
+
+  const token = localStorage.getItem("token");
+
+  useEffect(()=> {
+     async function fetchData() {
+      try{
+        const response = await fetch(`${baseUrl}/api/user/getUserInfo`,{
+          method : "GET",
+          headers : {
+            Authorization : `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+        if(response.ok){
+          console.log(data,"data");
+          setName(data?.name)
+        }else{
+          console.log("error while fetching data")
+        }
+     }catch(err){
+      console.log(err)
+     }
+    }
+
+     fetchData()
+  },[])
+  
 
 
-    const userName =  "John Doe"  
+
+    const userName =  name ?? "John Doe"  
     const firstName = Capitalise(userName.split(" ")[0]);
 
 
