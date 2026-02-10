@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { BsSearch } from "react-icons/bs";
 import Capitalise from "../utils/utils";
+import Loader from "../components/loader";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -16,9 +17,11 @@ function InventoryList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const itemsPerPage = 12;
+  const [loading, setLoading] = useState(false)
 
-
+    
     const fetchData = async () => {
+      setLoading(true);
       try {
         const response = await fetch(`${baseURL}/api/inventory/inventoryList`);
         const result = await response.json();
@@ -26,7 +29,9 @@ function InventoryList() {
       } catch (error) {
         console.error(error);
         setData([]);
-      }
+      }finally {
+      setLoading(false);
+    }
     };
 
   useEffect(() => {
@@ -35,6 +40,7 @@ function InventoryList() {
     fetchData();
   },[]);
 
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -42,7 +48,7 @@ function InventoryList() {
   const handleSubmit = async (e) => {
     const { name, ...payLoad } = formData;
     const capitalisedName = Capitalise(name.trim());
-
+    setLoading(true);
     e.preventDefault();
     try {
       const response = await fetch(`${baseURL}/api/inventory/addInventory`, {
@@ -52,6 +58,7 @@ function InventoryList() {
         },
         body: JSON.stringify({ name: capitalisedName, ...payLoad }),
       });
+      setLoading(false)
       if (response.ok) {
         setFormData({
           name: "",
@@ -281,6 +288,9 @@ function InventoryList() {
           </form>
         )}
       </div>
+      {loading && (
+        <Loader loading={loading}/>
+      )}
     </div>
   );
 }
