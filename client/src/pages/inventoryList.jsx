@@ -58,27 +58,41 @@ function InventoryList() {
         },
         body: JSON.stringify({ name: capitalisedName, ...payLoad }),
       });
-      setLoading(false)
       if (response.ok) {
         setFormData({
           name: "",
           category: "",
-          quantity: "",
-          reOrderPoint: "",
+          quantity: 0,
+          reOrderPoint: 0,
         });
         setShowForm(false);
-        fetchData();
+        await fetchData();
       }
     } catch (err) {
       console.log(err);
-    }
+    }finally {
+    setLoading(false);
+  }
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  let currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
 
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  let filteredData = data;
+
+if (search.length >= 3) {
+  filteredData = data.filter(item =>
+    item.name.toLowerCase().includes(search.toLowerCase())
+  );
+}
+
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+
+
+ const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+
 
   const categories = [
     "electronics",
@@ -94,14 +108,10 @@ function InventoryList() {
     "other",
   ];
 
-  if (search.length >= 3) {
-    currentItems = currentItems.filter((user) => {
-      return user.name.toLowerCase().includes(search.toLowerCase());
-    });
-  }
+
 
   return (
-    <div className="relative">
+    <div className="relative mb-5">
       <div className="flex-col justify-between items-center">
         <div className="flex items-center justify-between mt-10 mb-5 ml-150">
           <h1 className="text-5xl font-bold">Inventory List</h1>
@@ -140,7 +150,7 @@ function InventoryList() {
 
             <tbody>
               {currentItems.map((item, index) => (
-                <tr key={item.id} className="text-center">
+                <tr  key={item._id || item.id} className="text-center">
                   <td className="border px-4 py-2">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
@@ -150,7 +160,7 @@ function InventoryList() {
                   </td>
                   <td className="border px-4 py-2">{item.currentStock}</td>
                   <td className="border px-4 py-2">{item.reOrderPoint}</td>
-                  <td className="border px-4 py-2 font semi-bold">
+                  <td className="border px-4 py-2 font-semibold">
                     {item.currentStock === 0 ? (
                       <span className="text-red-500">Out of Stock</span>
                     ) : item.currentStock < item.reOrderPoint ? (
