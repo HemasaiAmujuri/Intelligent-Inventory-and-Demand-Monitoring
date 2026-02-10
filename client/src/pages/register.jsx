@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
+import Loader from "../components/loader";
 function Register() {
   const [formData, setFormData] = useState({    //initiate state for form data
     name: "",
@@ -65,6 +65,8 @@ function Register() {
 
       const data = await response.json(); //parse the response
 
+      setLoading(false)
+
       if (response.ok) {
         setMessage(data.message || "Registration Successful"); //display message
         // Navigate after 3 seconds
@@ -84,9 +86,7 @@ function Register() {
 
       // Clear form & message after 3 seconds
       setTimeout(resetForm, 3000);
-    } finally {     //it executes irrespectice of success and failure
-      setLoading(false); 
-    }
+    } 
   };
 
   return (
@@ -150,7 +150,6 @@ function Register() {
           />
 
           <span
-            type="button"
             className="absolute bottom-3 right-4 cursor-pointer"
             onClick={(e) => setShowPassword(!showPassword)}
           >
@@ -171,7 +170,6 @@ function Register() {
           />
 
           <span
-            type="button"
             className="absolute bottom-3 right-4 cursor-pointer"
             onClick={(e) => setShowConfirmPassword(!showConfirmPassword)}
           >
@@ -202,6 +200,9 @@ function Register() {
         <p className="text-sm text-center bg-blue-200 border rounded-lg p-2">
           {message}
         </p>
+      )}
+      {loading && (
+        <Loader loading={loading}/>
       )}
     </div>
   );

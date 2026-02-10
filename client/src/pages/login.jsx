@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { IoIosLock } from "react-icons/io";
+import Loader from "../components/loader";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -34,31 +35,31 @@ function Login() {
 
       const data = await response.json(); //parse the response
 
+      setLoading(false)
+
       if (response.ok) {
         setMessage(data.message || "Login Successful"); //display message
 
         localStorage.setItem("token", data?.token)
-
         // Navigate after 3 seconds
+       
         setTimeout(() => {
           navigate("/inventoryList");
         }, 3000);
       } else {
         //any api error
         setMessage(data.message || "Login failed");
-
+        
         // Clear form & message after 3 seconds
         setTimeout(resetForm, 3000);
       }
     } catch (err) {
       // Network or server error
       setMessage(err.message || "Server failed");
-
+      
       // Clear form & message after 3 seconds
       setTimeout(resetForm, 3000);
-    } finally {
-      setLoading(false);
-    }
+    } 
   };
 
   return (
@@ -68,7 +69,7 @@ function Login() {
         className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg flex flex-col gap-5"
       >
           <div className="flex justify-center items-center">
-            <IoIosLock className="w-30 h-30 text-blue-500" />
+            <IoIosLock className="w-32 h-32 text-blue-500" />
           </div>
         <h1 className="text-2xl font-bold text-center"> Login </h1>
 
@@ -99,7 +100,6 @@ function Login() {
           />
 
           <span
-            type="button"
             className="absolute bottom-3 right-4 cursor-pointer"
             onClick={(e) => setShowPassword(!showPassword)}
           >
@@ -130,6 +130,9 @@ function Login() {
         <p className="text-sm text-center bg-blue-200 border rounded-lg p-2">
           {message}
         </p>
+      )}
+        {loading && (
+        <Loader loading={loading}/>
       )}
     </div>
   );
