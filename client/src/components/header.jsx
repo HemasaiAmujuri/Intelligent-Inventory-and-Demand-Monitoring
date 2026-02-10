@@ -12,7 +12,7 @@ function Header() {
   const token = localStorage.getItem("token")
 
 
-    const userName = data?.name ?? "John Doe"    // get the name from token
+    const userName =  "John Doe"  
     const firstName = Capitalise(userName.split(" ")[0]);
 
 
