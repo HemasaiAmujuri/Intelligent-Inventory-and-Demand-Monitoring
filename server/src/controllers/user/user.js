@@ -12,10 +12,10 @@ const registerController = async (req, res) => {
   try {
     const data = req.body;
 
-    if (!data.email || !data.password) {
+    if (!data.name || !data.email || !data.mobile || !data.password) {
       return res.status(400).json({
         success: false,
-        message: "Email and password are required",
+        message: "Missing Required Fields",
       });
     }
 
@@ -34,7 +34,7 @@ const registerController = async (req, res) => {
     await user.save(); //here data saved in DB without this data is not saved in db
     return res
       .status(201)
-      .json({ success: true, data: user, message: "Register Successfully" }); //true response
+      .json({ success: true, data: user, message: "Registered Successfully" }); //true response
   } catch (err) {
     console.log(err.message);
     return res.status(500).json({ success: false, message: err.message }); //false response
