@@ -4,10 +4,9 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10; //bcrypt will run 2¹⁰ = 1024 rounds  and recommended way is 10 0r 12 incresing salt rounds lead to increse time complexity
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-dotenv.config()
+dotenv.config();
 
 const secretKey = process.env.SECRETKEY;
-
 
 const registerController = async (req, res) => {
   try {
@@ -73,7 +72,7 @@ const loginController = async (req, res) => {
     };
 
     const token = jwt.sign(payload, secretKey);
-  
+
     return res
       .status(200)
       .json({ success: true, token: token, message: "Login Successful" });
@@ -82,7 +81,49 @@ const loginController = async (req, res) => {
   }
 };
 
+const getUserInfo = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res
+        .status(401)
+        .json({ success: false, message: "No token provided" });
+    }
+
+    const token = authHeader.split(" ")[1];    //get token
+    if (!token) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Token missing" });
+    }
+
+    // Verify token
+    let userInfo;
+    try {
+      userInfo = jwt.verify(token, secretKey);
+    } catch (err) {
+      console.error("Token verification failed:", err.message);
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid or expired token" });
+    }
+
+    const name = userInfo?.name;
+    return res.status(200).json({
+      success: true,
+      name: name,
+      message: "Data retrieved successfully",
+    });
+  } catch (err) {
+    console.error("Server error:", err);
+    return res.status(500).json({ success: false, message: err?.message });
+  }
+};
+
+
 module.exports = {
   registerController,
   loginController,
+  getUserInfo,
 };
