@@ -31,7 +31,7 @@ function Header() {
 
   // Logout function
   const handleLogout = () => {    //REGIRECT TO LOGIN PAGE
-    localStorage.removeItem("name");
+    localStorage.clear();
     navigate("/login")
   };
 
