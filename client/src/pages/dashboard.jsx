@@ -1,26 +1,37 @@
 import { useState, useEffect } from "react";
+import Loader from "../components/loader";
                                                       
 const baseURL = import.meta.env.VITE_BASE_URL;  
 
 function Dashboard() {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false)
+
 
   useEffect(() => {    // api integration
-    const fetchData = async (req, res) => {
+    const fetchData = async () => {
+      setLoading(true)
       try {
         const response = await fetch(
           `${baseURL}/api/inventory/getCriticalInventoryAlerts`,
         );
         const data = await response.json();   //parse the response
-        setData(data.data)
+        setData(data.data || [])
       } catch (err) {
         console.log(err);
         setData([]);
+      }finally{
+        setLoading(false)
       }
     };
 
     fetchData();  
   }, []);    // load api eveny mounting
+
+   if (loading) {
+  return <Loader loading={loading} />;
+}
+
 
   return (
   <div className="bg-gray-50 mb-10">
@@ -41,7 +52,7 @@ function Dashboard() {
 
             return (
               <div
-                key={item.id}
+                key={item._id || item.id}
                 className={`flex items-start gap-4 p-4 rounded-lg border ${
                   isOutOfStock
                     ? "bg-red-100 border-red-500"
