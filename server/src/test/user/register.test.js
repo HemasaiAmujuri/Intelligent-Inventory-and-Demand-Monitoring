@@ -16,7 +16,7 @@ describe("POST /api/user/register", () => {              //group all test cases
     expect(res.body.data).toHaveProperty("_id"); // user object returned
   });
 
-  it("should fail if email or password missing", async () => {         //second test case
+  it("should fail if name or email or mobile or password missing", async () => {         //second test case
     const res = await request(app)
       .post("/api/user/register")
       .send({ name: "", email: "", password: "", mobile: "" });
