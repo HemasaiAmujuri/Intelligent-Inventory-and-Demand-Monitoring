@@ -63,6 +63,11 @@ useEffect(() => {
 }, []);
 
 
+useEffect(() => {
+  setCurrentPage(1);
+}, [search]);
+
+
 
    let filteredItems = data.filter((item) => item.currentStock > 0);
 

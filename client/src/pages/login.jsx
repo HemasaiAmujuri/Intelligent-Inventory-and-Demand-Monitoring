@@ -35,31 +35,31 @@ function Login() {
 
       const data = await response.json(); //parse the response
 
-      setLoading(false)
+      setLoading(false);
 
       if (response.ok) {
         setMessage(data.message || "Login Successful"); //display message
 
-        localStorage.setItem("token", data?.token)
+        localStorage.setItem("token", data?.token);
         // Navigate after 3 seconds
-       
+
         setTimeout(() => {
           navigate("/inventoryList");
         }, 3000);
       } else {
         //any api error
         setMessage(data.message || "Login failed");
-        
+
         // Clear form & message after 3 seconds
         setTimeout(resetForm, 3000);
       }
     } catch (err) {
       // Network or server error
       setMessage(err.message || "Server failed");
-      
+
       // Clear form & message after 3 seconds
       setTimeout(resetForm, 3000);
-    } 
+    }
   };
 
   return (
@@ -68,9 +68,9 @@ function Login() {
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg flex flex-col gap-5"
       >
-          <div className="flex justify-center items-center">
-            <IoIosLock className="w-32 h-32 text-blue-500" />
-          </div>
+        <div className="flex justify-center items-center">
+          <IoIosLock className="w-32 h-32 text-blue-500" />
+        </div>
         <h1 className="text-2xl font-bold text-center"> Login </h1>
 
         <div className="flex flex-col gap-1">
@@ -80,7 +80,7 @@ function Login() {
             name="email"
             pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
             value={email}
-            onChange={(e)=> setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             className="border rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-400"
             required
           />
@@ -109,11 +109,13 @@ function Login() {
 
         <button
           type="submit"
-          className="bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition"
+          className={`bg-blue-600 text-white rounded-lg py-2 font-semibold 
+              hover:bg-blue-700 transition 
+              ${loading ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
           disabled={loading}
-        >   
-                                                           {/* // BASED ON LOADING */}
-          {loading ? "Submitting" : "Submit"}  
+        >
+          {/* // BASED ON LOADING */}
+          {loading ? "Submitting" : "Submit"}
         </button>
 
         <div className="w-full flex justify-end mt-2">
@@ -131,9 +133,7 @@ function Login() {
           {message}
         </p>
       )}
-        {loading && (
-        <Loader loading={loading}/>
-      )}
+      {loading && <Loader loading={loading} />}
     </div>
   );
 }

@@ -41,6 +41,12 @@ function InventoryList() {
   },[]);
 
 
+  useEffect(() => {
+  setCurrentPage(1);
+}, [search]);
+
+
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
