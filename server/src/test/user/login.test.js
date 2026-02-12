@@ -7,8 +7,8 @@ describe("POST api/user/login", () => {
       const res = await request(app)   // send fake http request to app
          .post("/api/user/login")      //check api Url
          .send({                       //sample payload
-            email : "demo@example.com",
-            password : "demoPass"
+            email : "sai3@gmail.com",
+            password : "1234567890"
          });
 
          expect(res.statusCode).toBe(200);  //check correct or not
