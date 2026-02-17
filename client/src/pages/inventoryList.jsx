@@ -18,6 +18,7 @@ function InventoryList() {
   const [search, setSearch] = useState("");
   const itemsPerPage = 12;
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("")
 
   const fetchData = async () => {
     setLoading(true);
@@ -45,35 +46,54 @@ function InventoryList() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    const { name, ...payLoad } = formData;
-    const capitalisedName = Capitalise(name.trim());
-    setLoading(true);
-    e.preventDefault();
-    try {
-      const response = await fetch(`${baseURL}/api/inventory/addInventory`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: capitalisedName, ...payLoad }),
+const handleSubmit = async (e) => {
+  e.preventDefault(); // prevent default first
+
+  const { name, category, quantity, reOrderPoint } = formData;
+
+  // Validation for required fields
+  if (!name.trim() || !category || category === "Select Category" || quantity === "") {
+    setMessage("Please fill all the required fields."); // show error
+    setTimeout(()=>{
+      setMessage("")
+    },2000);
+    return; // stop submission
+  }
+
+  const capitalisedName = Capitalise(name.trim());
+  setLoading(true);
+
+  try {
+    const response = await fetch(`${baseURL}/api/inventory/addInventory`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name: capitalisedName, category, quantity, reOrderPoint }),
+    });
+
+    if (response.ok) {
+      // Reset form
+      setFormData({
+        name: "",
+        category: "",
+        quantity: 0,
+        reOrderPoint: 0,
       });
-      if (response.ok) {
-        setFormData({
-          name: "",
-          category: "",
-          quantity: 0,
-          reOrderPoint: 0,
-        });
-        setShowForm(false);
-        await fetchData();
-      }
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
+      setShowForm(false); // close form
+      await fetchData();
+    } else {
+      const errorData = await response.json();
+      setMessage(errorData.message || "Something went wrong.");
     }
-  };
+  } catch (err) {
+    console.log(err);
+    setMessage("Failed to submit form.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   let filteredData = data;
 
@@ -288,6 +308,12 @@ function InventoryList() {
             >
               Submit
             </button>
+
+             {message && (
+              <p className="text-sm text-center bg-blue-200 border rounded-lg p-2">
+                {message}
+              </p>
+            )}
           </form>
         )}
       </div>
