@@ -17,35 +17,29 @@ function InventoryList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const itemsPerPage = 12;
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
-    
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`${baseURL}/api/inventory/inventoryList`);
-        const result = await response.json();
-        setData(result.data || []);
-      } catch (error) {
-        console.error(error);
-        setData([]);
-      }finally {
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${baseURL}/api/inventory/inventoryList`);
+      const result = await response.json();
+      setData(result.data || []);
+    } catch (error) {
+      console.error(error);
+      setData([]);
+    } finally {
       setLoading(false);
     }
-    };
+  };
 
   useEffect(() => {
-  
-
     fetchData();
-  },[]);
-
+  }, []);
 
   useEffect(() => {
-  setCurrentPage(1);
-}, [search]);
-
-
+    setCurrentPage(1);
+  }, [search]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -76,29 +70,24 @@ function InventoryList() {
       }
     } catch (err) {
       console.log(err);
-    }finally {
-    setLoading(false);
-  }
+    } finally {
+      setLoading(false);
+    }
   };
-
 
   let filteredData = data;
 
-if (search.length >= 3) {
-  filteredData = data.filter(item =>
-    item.name.toLowerCase().includes(search.toLowerCase())
-  );
-}
-
+  if (search.length >= 3) {
+    filteredData = data.filter((item) =>
+      item.name.toLowerCase().includes(search.toLowerCase()),
+    );
+  }
 
   const indexOfLastItem = currentPage * itemsPerPage;
-const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
-
- const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const categories = [
     "electronics",
@@ -113,8 +102,6 @@ const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
     "books",
     "other",
   ];
-
-
 
   return (
     <div className="relative mb-5">
@@ -156,7 +143,7 @@ const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
             <tbody>
               {currentItems.map((item, index) => (
-                <tr  key={item._id || item.id} className="text-center">
+                <tr key={item._id || item.id} className="text-center">
                   <td className="border px-4 py-2">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
@@ -304,9 +291,7 @@ const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
           </form>
         )}
       </div>
-      {loading && (
-        <Loader loading={loading}/>
-      )}
+      {loading && <Loader loading={loading} />}
     </div>
   );
 }

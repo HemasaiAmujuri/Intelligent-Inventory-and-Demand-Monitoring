@@ -27,7 +27,7 @@ function Order() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${baseUrl}/api/inventory/inventoryList`);    //INTEGRATE API
+      const response = await fetch(`${baseUrl}/api/inventory/inventoryList`); //INTEGRATE API
 
       if (!response.ok) {
         throw new Error("Failed to fetch inventory list");
@@ -47,39 +47,37 @@ function Order() {
     fetchData();
   }, []);
 
-useEffect(() => {
-  const fetchProductNames = async () => {
-    try {
-      const response = await fetch(`${baseUrl}/api/inventory/getAllProductNames`);      //RETRIEVE ALL PRODUCT NAMES
-      if (!response.ok) throw new Error("Failed to fetch product names");
-      const data = await response.json();
-      setProductNames(data.data || []);
-    } catch (err) {
-      console.error(err);
-      setProductNames([]);
-    }
-  };
-  fetchProductNames();
-}, []);
+  useEffect(() => {
+    const fetchProductNames = async () => {
+      try {
+        const response = await fetch(
+          `${baseUrl}/api/inventory/getAllProductNames`,
+        ); //RETRIEVE ALL PRODUCT NAMES
+        if (!response.ok) throw new Error("Failed to fetch product names");
+        const data = await response.json();
+        setProductNames(data.data || []);
+      } catch (err) {
+        console.error(err);
+        setProductNames([]);
+      }
+    };
+    fetchProductNames();
+  }, []);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]); //when user search anything current page set to 1
 
-useEffect(() => {
-  setCurrentPage(1);
-}, [search]);                           //when user search anything current page set to 1
+  let filteredItems = data.filter((item) => item.currentStock > 0);
 
-
-
-   let filteredItems = data.filter((item) => item.currentStock > 0);
-
-    if (search.length >= 3) {                                    //filter items if search length greater than 3
+  if (search.length >= 3) {
+    //filter items if search length greater than 3
     filteredItems = filteredItems.filter((user) => {
       return user.name.toLowerCase().includes(search.toLowerCase());
     });
   }
 
- 
-
-  const indexOfLastItem = currentPage * itemsPerPage;                      //pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage; //pagination logic
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   let currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
@@ -133,9 +131,8 @@ useEffect(() => {
   ];
 
   if (loading) {
-  return <Loader loading={loading} />;
-}
-
+    return <Loader loading={loading} />;
+  }
 
   return (
     <div>
@@ -154,41 +151,40 @@ useEffect(() => {
         <BsSearch className="absolute left-47 top-6" />
       </div>
       <div className="flex justify-center items-center flex-wrap m-5 gap-12 border rounded-lg px-5 py-5 pt-15 max-h-[500px] overflow-y-auto">
-        {currentItems
-          .map((item) => (
-            <div
-              key={item._id || item.id}
-              className="flex flex-col p-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg duration-400 gap-2 w-60 bg-gray-500"
-            >
-              <div className="flex gap-2">
-                <span className="font-bold">Name:</span>
-                <span>{Capitalise(item?.name)}</span>
-              </div>
-              <div className="flex gap-2">
-                <span className="font-bold">Category:</span>
-                <span>{Capitalise(item?.category)}</span>
-              </div>
-              <div className="flex gap-2">
-                <span className="font-bold">Current Stock:</span>
-                <span>{item?.currentStock}</span>
-              </div>
-              <div className="flex justify-end">
-                <button
-                  className="flex justify-center items center p-2 bg-blue-500 border rounded-lg w-30"
-                  onClick={() => {
-                    setShowForm(true);
-                    setFormData({
-                      productName: item?.name,
-                      category: item?.category.toLowerCase(),
-                      quantity: item?.currentStock,
-                    });
-                  }}
-                >
-                  Create Order
-                </button>
-              </div>
+        {currentItems.map((item) => (
+          <div
+            key={item._id || item.id}
+            className="flex flex-col p-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg duration-400 gap-2 w-60 bg-gray-500"
+          >
+            <div className="flex gap-2">
+              <span className="font-bold">Name:</span>
+              <span>{Capitalise(item?.name)}</span>
             </div>
-          ))}
+            <div className="flex gap-2">
+              <span className="font-bold">Category:</span>
+              <span>{Capitalise(item?.category)}</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="font-bold">Current Stock:</span>
+              <span>{item?.currentStock}</span>
+            </div>
+            <div className="flex justify-end">
+              <button
+                className="flex justify-center items center p-2 bg-blue-500 border rounded-lg w-30"
+                onClick={() => {
+                  setShowForm(true);
+                  setFormData({
+                    productName: item?.name,
+                    category: item?.category.toLowerCase(),
+                    quantity: item?.currentStock,
+                  });
+                }}
+              >
+                Create Order
+              </button>
+            </div>
+          </div>
+        ))}
         {showForm && (
           <form
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2

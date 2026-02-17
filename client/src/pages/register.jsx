@@ -3,7 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Loader from "../components/loader";
 function Register() {
-  const [formData, setFormData] = useState({    //initiate state for form data
+  const [formData, setFormData] = useState({
+    //initiate state for form data
     name: "",
     email: "",
     mobile: "",
@@ -15,7 +16,7 @@ function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const baseURL = import.meta.env.VITE_BASE_URL;   // get host url from env
+  const baseURL = import.meta.env.VITE_BASE_URL; // get host url from env
 
   const navigate = useNavigate();
 
@@ -40,7 +41,7 @@ function Register() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();   // it prevents browser default behaviour when form submit (prevent page refresh)
+    e.preventDefault(); // it prevents browser default behaviour when form submit (prevent page refresh)
     if (formData.password !== formData.confirmPassword) {
       // checking password mismatches
       setMessage("Passwords do not match");
@@ -65,7 +66,7 @@ function Register() {
 
       const data = await response.json(); //parse the response
 
-      setLoading(false)
+      setLoading(false);
 
       if (response.ok) {
         setMessage(data.message || "Registration Successful"); //display message
@@ -86,7 +87,7 @@ function Register() {
 
       // Clear form & message after 3 seconds
       setTimeout(resetForm, 3000);
-    } 
+    }
   };
 
   return (
@@ -182,8 +183,8 @@ function Register() {
           className="bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition"
           disabled={loading}
         >
-                                                              {/* // based on loading state */}
-          {loading ? "Submitting" : "Submit"}  
+          {/* // based on loading state */}
+          {loading ? "Submitting" : "Submit"}
         </button>
 
         <div className="w-full flex justify-end mt-2">
@@ -196,14 +197,12 @@ function Register() {
         </div>
       </form>
 
-      {message && (   // message UI 
+      {message && ( // message UI
         <p className="text-sm text-center bg-blue-200 border rounded-lg p-2">
           {message}
         </p>
       )}
-      {loading && (
-        <Loader loading={loading}/>
-      )}
+      {loading && <Loader loading={loading} />}
     </div>
   );
 }
