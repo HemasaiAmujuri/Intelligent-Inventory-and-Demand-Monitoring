@@ -27,7 +27,7 @@ function Order() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${baseUrl}/api/inventory/inventoryList`);
+      const response = await fetch(`${baseUrl}/api/inventory/inventoryList`);    //INTEGRATE API
 
       if (!response.ok) {
         throw new Error("Failed to fetch inventory list");
@@ -50,7 +50,7 @@ function Order() {
 useEffect(() => {
   const fetchProductNames = async () => {
     try {
-      const response = await fetch(`${baseUrl}/api/inventory/getAllProductNames`);
+      const response = await fetch(`${baseUrl}/api/inventory/getAllProductNames`);      //RETRIEVE ALL PRODUCT NAMES
       if (!response.ok) throw new Error("Failed to fetch product names");
       const data = await response.json();
       setProductNames(data.data || []);
@@ -65,13 +65,13 @@ useEffect(() => {
 
 useEffect(() => {
   setCurrentPage(1);
-}, [search]);
+}, [search]);                           //when user search anything current page set to 1
 
 
 
    let filteredItems = data.filter((item) => item.currentStock > 0);
 
-    if (search.length >= 3) {
+    if (search.length >= 3) {                                    //filter items if search length greater than 3
     filteredItems = filteredItems.filter((user) => {
       return user.name.toLowerCase().includes(search.toLowerCase());
     });
@@ -79,7 +79,7 @@ useEffect(() => {
 
  
 
-  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfLastItem = currentPage * itemsPerPage;                      //pagination logic
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   let currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
