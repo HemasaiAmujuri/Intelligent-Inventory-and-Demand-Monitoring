@@ -69,9 +69,12 @@ const loginController = async (req, res) => {
     const payload = {
       id: user._id,
       name: user.name,
+      expires: "1hr",
     };
 
-    const token = jwt.sign(payload, secretKey);
+    const token = jwt.sign(payload, secretKey, {
+      expiresIn: "1h",
+    });
 
     return res
       .status(200)
@@ -91,11 +94,9 @@ const getUserInfo = async (req, res) => {
         .json({ success: false, message: "No token provided" });
     }
 
-    const token = authHeader.split(" ")[1];    //get token
+    const token = authHeader.split(" ")[1]; //get token
     if (!token) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Token missing" });
+      return res.status(401).json({ success: false, message: "Token missing" });
     }
 
     // Verify token
@@ -120,7 +121,6 @@ const getUserInfo = async (req, res) => {
     return res.status(500).json({ success: false, message: err?.message });
   }
 };
-
 
 module.exports = {
   registerController,
