@@ -6,7 +6,9 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const secretKey = process.env.SECRETKEY;
+
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
 const registerController = async (req, res) => {
   try {
@@ -32,9 +34,33 @@ const registerController = async (req, res) => {
     }
     const user = new userSchema(data);
     await user.save(); //here data saved in DB without this data is not saved in db
+
+    const payload = {
+      id: user.id,
+      name: user.name,
+    };
+
+    const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {    // generate access token
+      expiresIn: "15min",
+    });
+
+    const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, {   // generate refresh token
+      expiresIn: "7d",
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true, // JavaScript cannot access
+      secure: true, // HTTPS only
+      sameSite: "Strict", // CSRF protection
+    });
     return res
       .status(201)
-      .json({ success: true, data: user, message: "Registered Successfully" }); //true response
+      .json({
+        success: true,
+        data: user,
+        token: accessToken,
+        message: "Registered Successfully",
+      }); //true response
   } catch (err) {
     console.log(err.message);
     return res.status(500).json({ success: false, message: err.message }); //false response
@@ -69,61 +95,45 @@ const loginController = async (req, res) => {
     const payload = {
       id: user._id,
       name: user.name,
-      expires: "1hr",
     };
 
-    const token = jwt.sign(payload, secretKey, {
-      expiresIn: "1h",
+    const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
+      expiresIn : "15min"
+    })
+
+    const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, {
+      expiresIn: "7d",
     });
+
+    res.cookie( "refreshToken", refreshToken, {
+      httpOnly : true,   //Javascript cannot access
+      secure : true,      // HTTPS only
+      sameSite: "Strict", // CSRF protection
+
+    })
+
 
     return res
       .status(200)
-      .json({ success: true, token: token, message: "Login Successful" });
+      .json({ success: true, token: accessToken, message: "Login Successful" });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
 
-const getUserInfo = async (req, res) => {
-  try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader) {
-      return res
-        .status(401)
-        .json({ success: false, message: "No token provided" });
-    }
-
-    const token = authHeader.split(" ")[1]; //get token
-    if (!token) {
-      return res.status(401).json({ success: false, message: "Token missing" });
-    }
-
-    // Verify token
-    let userInfo;
-    try {
-      userInfo = jwt.verify(token, secretKey);
-    } catch (err) {
-      console.error("Token verification failed:", err.message);
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid or expired token" });
-    }
-
-    const name = userInfo?.name;
-    return res.status(200).json({
-      success: true,
-      name: name,
-      message: "Data retrieved successfully",
-    });
-  } catch (err) {
-    console.error("Server error:", err);
-    return res.status(500).json({ success: false, message: err?.message });
-  }
+const getUserInfo = (req, res) => {
+  const name = req.user?.name;
+  return res.status(200).json({
+    success: true,
+    name,
+    message: "Data retrieved successfully",
+  });
 };
+
 
 module.exports = {
   registerController,
   loginController,
   getUserInfo,
 };
+

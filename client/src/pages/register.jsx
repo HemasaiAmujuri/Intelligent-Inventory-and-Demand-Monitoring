@@ -2,7 +2,11 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Loader from "../components/loader";
+import { useAuth } from "../context/useContext";
+
+
 function Register() {
+  const { setAccessToken } = useAuth();
   const [formData, setFormData] = useState({
     //initiate state for form data
     name: "",
@@ -70,10 +74,8 @@ function Register() {
 
       if (response.ok) {
         setMessage(data.message || "Registration Successful"); //display message
+        setAccessToken(data?.token)
         // Navigate after 3 seconds
-        setTimeout(() => {
-          navigate("/login");
-        }, 3000);
       } else {
         //any api error
         setMessage(data.message || "Registration failed");
