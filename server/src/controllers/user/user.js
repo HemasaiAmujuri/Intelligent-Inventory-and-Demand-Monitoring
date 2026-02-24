@@ -131,9 +131,73 @@ const getUserInfo = (req, res) => {
 };
 
 
+
+const refreshTokenController = (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token not found",
+      });
+    }
+
+    //Verify refresh token
+    let decoded;
+    try {
+      decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    } catch (err) {
+      return res.status(403).json({
+        success: false,
+        message: "Invalid or expired refresh token",
+      });
+    }
+
+    // Generate new access token
+    const payload = {
+      id: decoded.id,
+      name: decoded.name,
+    };
+
+    const newAccessToken = jwt.sign(
+      payload,
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "15m" }
+    );
+
+  // Generate new refresh token (rotation)
+    const newRefreshToken = jwt.sign(
+      payload,
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    // 5️⃣ Replace old refresh token cookie
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
+    });
+
+    // 6️⃣ Send new access token to frontend
+    return res.status(200).json({
+      success: true,
+      accessToken: newAccessToken,
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
 module.exports = {
   registerController,
   loginController,
   getUserInfo,
+  refreshTokenController
 };
 
