@@ -6,9 +6,12 @@ const AuthContext = createContext();
 export const AuthProvider = ( { children } ) => {
     const [accessToken, setAccessToken] = useState(null);
 
+       console.log("Access Token", accessToken)
 
     return (
         <AuthContext.Provider value = { {accessToken, setAccessToken }}>
+
+           
             {children}
         </AuthContext.Provider>
     )

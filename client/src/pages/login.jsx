@@ -3,8 +3,10 @@ import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { IoIosLock } from "react-icons/io";
 import Loader from "../components/loader";
+import { useAuth } from "../context/useContext";
 
 function Login() {
+   const { setAccessToken } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -31,6 +33,7 @@ function Login() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
 
       const data = await response.json(); //parse the response
@@ -40,8 +43,7 @@ function Login() {
       if (response.ok) {
         setMessage(data.message || "Login Successful"); //display message
 
-        localStorage.setItem("token", data?.token);
-        // Navigate after 3 seconds
+        setAccessToken(data?.token);
 
         setTimeout(() => {
           navigate("/inventoryList");

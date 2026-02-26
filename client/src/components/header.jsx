@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { FaUser } from "react-icons/fa";
 import { useNavigate, Link } from "react-router-dom";
 import Capitalise from "../utils/utils";
+import { useAuth } from "../context/useContext"
 
 function Header() {
+  const { accessToken } = useAuth();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [name, setName] = useState("");
@@ -12,31 +14,63 @@ function Header() {
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
 
-  const token = localStorage.getItem("token");
+  console.log(baseUrl, "baseUrl")
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch(`${baseUrl}/api/user/getUserInfo`, {
+
+useEffect(() => {
+  if (!accessToken) return; // only fetch if token exists
+
+  async function fetchData() {
+    try {
+      let response = await fetch(`${baseUrl}/api/user/getUserInfo`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // needed if refresh token is in httpOnly cookie
+      });
+
+      // If access token expired, try refresh
+      if (response.status === 401) {
+        const refreshRes = await fetch(`${baseUrl}/api/user/refreshToken`, {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include",
         });
-        const data = await response.json();
-        if (response.ok) {
-          console.log(data, "data");
-          setName(data?.name);
-        } else {
-          console.log("error while fetching data");
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
+        const refreshData = await refreshRes.json();
 
-    fetchData();
-  }, []);
+        if (refreshData.accessToken) {
+          setAccessToken(refreshData.accessToken);
+
+          // retry original request with new access token
+          response = await fetch(`${baseUrl}/api/user/getUserInfo`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${refreshData.accessToken}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          });
+        } else {
+          console.log("Refresh token invalid or expired");
+          return;
+        }
+      }
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data, "data");
+        setName(data?.name);
+      } else {
+        console.log("Error while fetching data:", data?.message);
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
+  }
+
+  fetchData();
+}, [accessToken]); // add accessToken as dependency
 
   const userName = name ?? "John Doe";
   const firstName = Capitalise(userName.split(" ")[0]);
@@ -54,8 +88,6 @@ function Header() {
 
   // Logout function
   const handleLogout = () => {
-    //REGIRECT TO LOGIN PAGE
-    localStorage.clear();
     navigate("/login");
   };
 
