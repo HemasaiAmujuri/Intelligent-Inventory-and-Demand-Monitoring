@@ -8,7 +8,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 router.get("/inventory/inventoryList",  getInventoryProducts);
 router.post("/inventory/addInventory", addInventoryProducts);
-router.get("/inventory/getCriticalInventoryAlerts", getCriticalInventoryAlerts);
+router.get("/inventory/getCriticalInventoryAlerts",  authMiddleware, getCriticalInventoryAlerts);
 router.post("/user/register",registerController);
 router.post("/user/login",loginController);
 router.post("/order/createOrder", createOrder);
