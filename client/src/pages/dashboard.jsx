@@ -1,32 +1,101 @@
 import { useState, useEffect } from "react";
 import Loader from "../components/loader";
+import useAuth from "../context/useContext"
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
 function Dashboard() {
+  const { accessToken, setAccessToken } = useAuth();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // api integration
+  // useEffect(() => {
+  //   // api integration
+  //   const fetchData = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const response = await fetch(
+  //         `${baseURL}/api/inventory/getCriticalInventoryAlerts`,
+  //         {
+  //           headers : {
+  //             "Content-Type" : "application/json",
+  //             "Authorization": `Bearer ${accessToken}`
+  //           }
+  //         }
+  //       );
+  //       const data = await response.json(); //parse the response
+  //       setData(data.data || []);
+  //     } catch (err) {
+  //        if (err?.status === 401){
+  //         try{
+  //         const response = await fetch(`${baseURL}/api/user/refreshToken`)
+
+  //         const data = await response.json();
+
+  //         setAccessToken(data?.accessToken);
+  //        }
+  //       catch(err){
+  //           console.log(err)
+  //       }}
+  //       console.log(err);
+  //       setData([]);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []); // load api eveny mounting
+
+   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+
+      const callApi = async (token) => {
+        return fetch(`${baseURL}/api/inventory/getCriticalInventoryAlerts`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          credentials: "include", // needed for refresh token cookie
+        });
+      };
+
       try {
-        const response = await fetch(
-          `${baseURL}/api/inventory/getCriticalInventoryAlerts`,
-        );
-        const data = await response.json(); //parse the response
-        setData(data.data || []);
+        let response = await callApi(accessToken);
+
+        if (response.status === 401) {
+          // Access token expired, call refresh token API
+          const refreshResponse = await fetch(`${baseURL}/api/user/refreshToken`, {
+            method: "POST",
+            credentials: "include", // send refresh token cookie
+          });
+
+          if (!refreshResponse.ok) throw new Error("Refresh token failed");
+
+          const refreshData = await refreshResponse.json();
+          const newAccessToken = refreshData.accessToken;
+
+          // Update access token in context
+          setAccessToken(newAccessToken);
+
+          // Retry original API with new access token
+          response = await callApi(newAccessToken);
+        }
+
+        const result = await response.json();
+        setData(result.data || []);
       } catch (err) {
-        console.log(err);
+        console.error(err);
         setData([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, []); // load api eveny mounting
+    if (accessToken) fetchData();
+  }, [accessToken, baseURL, setAccessToken]);
 
   if (loading) {
     return <Loader loading={loading} />;
