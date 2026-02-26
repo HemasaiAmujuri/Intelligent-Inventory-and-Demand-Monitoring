@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Loader from "../components/loader";
-import useAuth from "../context/useContext"
+import { useAuth } from "../context/useContext"
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -8,8 +8,6 @@ function Dashboard() {
   const { accessToken, setAccessToken } = useAuth();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  // useEffect(() => {
   //   // api integration
   //   const fetchData = async () => {
   //     setLoading(true);

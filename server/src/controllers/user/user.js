@@ -44,14 +44,22 @@ const registerController = async (req, res) => {
       expiresIn: "15min",
     });
 
+
+    console.log(accessToken)
+
+
+
     const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, {   // generate refresh token
       expiresIn: "7d",
     });
 
+
+    console.log(refreshToken)
+
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true, // JavaScript cannot access
-      secure: true, // HTTPS only
-      sameSite: "Strict", // CSRF protection
+      secure : false,
+      sameSite: "None", // CSRF protection
     });
     return res
       .status(201)
@@ -107,7 +115,6 @@ const loginController = async (req, res) => {
 
     res.cookie( "refreshToken", refreshToken, {
       httpOnly : true,   //Javascript cannot access
-      secure : true,      // HTTPS only
       sameSite: "Strict", // CSRF protection
 
     })
@@ -173,10 +180,10 @@ const refreshTokenController = (req, res) => {
       { expiresIn: "7d" }
     );
 
+    console.log(refreshToken, "refreshToken");
     // 5️⃣ Replace old refresh token cookie
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
-      secure: true,
       sameSite: "Strict",
     });
 

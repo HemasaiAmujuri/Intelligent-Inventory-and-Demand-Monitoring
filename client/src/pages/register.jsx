@@ -66,6 +66,7 @@ function Register() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payLoad),
+        credentials: "include"
       });
 
       const data = await response.json(); //parse the response
@@ -75,6 +76,10 @@ function Register() {
       if (response.ok) {
         setMessage(data.message || "Registration Successful"); //display message
         setAccessToken(data?.token)
+
+               setTimeout(() => {
+          navigate("/inventoryList");
+        }, 3000);
         // Navigate after 3 seconds
       } else {
         //any api error
