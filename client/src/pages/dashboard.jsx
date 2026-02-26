@@ -8,42 +8,7 @@ function Dashboard() {
   const { accessToken, setAccessToken } = useAuth();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  //   // api integration
-  //   const fetchData = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const response = await fetch(
-  //         `${baseURL}/api/inventory/getCriticalInventoryAlerts`,
-  //         {
-  //           headers : {
-  //             "Content-Type" : "application/json",
-  //             "Authorization": `Bearer ${accessToken}`
-  //           }
-  //         }
-  //       );
-  //       const data = await response.json(); //parse the response
-  //       setData(data.data || []);
-  //     } catch (err) {
-  //        if (err?.status === 401){
-  //         try{
-  //         const response = await fetch(`${baseURL}/api/user/refreshToken`)
-
-  //         const data = await response.json();
-
-  //         setAccessToken(data?.accessToken);
-  //        }
-  //       catch(err){
-  //           console.log(err)
-  //       }}
-  //       console.log(err);
-  //       setData([]);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []); // load api eveny mounting
+  
 
    useEffect(() => {
     const fetchData = async () => {
