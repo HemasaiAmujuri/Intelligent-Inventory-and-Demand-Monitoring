@@ -2,8 +2,11 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { IoIosLock } from "react-icons/io";
+import Loader from "../components/loader";
+import { useAuth } from "../context/useContext";
 
 function Login() {
+   const { setAccessToken } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -30,15 +33,18 @@ function Login() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
 
       const data = await response.json(); //parse the response
 
+      setLoading(false);
+
       if (response.ok) {
         setMessage(data.message || "Login Successful"); //display message
-        localStorage.setItem("name", data?.data?.name)
 
-        // Navigate after 3 seconds
+        setAccessToken(data?.token);
+
         setTimeout(() => {
           navigate("/inventoryList");
         }, 3000);
@@ -55,8 +61,6 @@ function Login() {
 
       // Clear form & message after 3 seconds
       setTimeout(resetForm, 3000);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -66,9 +70,9 @@ function Login() {
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg flex flex-col gap-5"
       >
-          <div className="flex justify-center items-center">
-            <IoIosLock className="w-30 h-30 text-blue-500" />
-          </div>
+        <div className="flex justify-center items-center">
+          <IoIosLock className="w-32 h-32 text-blue-500" />
+        </div>
         <h1 className="text-2xl font-bold text-center"> Login </h1>
 
         <div className="flex flex-col gap-1">
@@ -78,7 +82,7 @@ function Login() {
             name="email"
             pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
             value={email}
-            onChange={(e)=> setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             className="border rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-400"
             required
           />
@@ -98,7 +102,6 @@ function Login() {
           />
 
           <span
-            type="button"
             className="absolute bottom-3 right-4 cursor-pointer"
             onClick={(e) => setShowPassword(!showPassword)}
           >
@@ -108,11 +111,13 @@ function Login() {
 
         <button
           type="submit"
-          className="bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition"
+          className={`bg-blue-600 text-white rounded-lg py-2 font-semibold 
+              hover:bg-blue-700 transition 
+              ${loading ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
           disabled={loading}
-        >   
-                                                           {/* // BASED ON LOADING */}
-          {loading ? "Submitting" : "Submit"}  
+        >
+          {/* // BASED ON LOADING */}
+          {loading ? "Submitting" : "Submit"}
         </button>
 
         <div className="w-full flex justify-end mt-2">
@@ -130,6 +135,7 @@ function Login() {
           {message}
         </p>
       )}
+      {loading && <Loader loading={loading} />}
     </div>
   );
 }

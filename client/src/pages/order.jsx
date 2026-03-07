@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { BsSearch } from "react-icons/bs";
+import Capitalise from "../utils/utils";
+import Loader from "../components/loader";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -7,86 +9,114 @@ function Order() {
   const [data, setData] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-      productName : "",
-      category : "",
-      quantity : ""
+    productName: "",
+    category: "",
+    quantity: "",
   });
-  const [message,setMessage] = useState("");
+  const [message, setMessage] = useState("");
   const [productNames, setProductNames] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
-  const itemsPerPage = 10
+  const [loading, setLoading] = useState(false);
+  const itemsPerPage = 10;
 
-
-
-   const handleChange = (e) => {
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };    
+  };
 
-    const fetchData = async () => {
-      const response = await fetch(`${baseUrl}/api/inventory/inventoryList`);
-      const data = await response.json(); // parse the response
-      setData(data.data);
-    };
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${baseUrl}/api/inventory/inventoryList`); //INTEGRATE API
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch inventory list");
+      }
+
+      const result = await response.json(); // parse the response
+      setData(result?.data || []);
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-      fetchData();
+    fetchData();
   }, []);
 
-  useEffect(()=>{
-        const fetchProductNames = async () => {
-          const response = await fetch(`${baseUrl}/api/inventory/getAllProductNames`);
-          const data = await response.json();
-          setProductNames(data.data)
-        }
-        fetchProductNames()
-  },[]);
+  useEffect(() => {
+    const fetchProductNames = async () => {
+      try {
+        const response = await fetch(
+          `${baseUrl}/api/inventory/getAllProductNames`,
+        ); //RETRIEVE ALL PRODUCT NAMES
+        if (!response.ok) throw new Error("Failed to fetch product names");
+        const data = await response.json();
+        setProductNames(data.data || []);
+      } catch (err) {
+        console.error(err);
+        setProductNames([]);
+      }
+    };
+    fetchProductNames();
+  }, []);
 
-  const filteredItems = data.filter(item => item.currentStock > 0); 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]); //when user search anything current page set to 1
 
-  const indexOfLastItem = currentPage*itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem-itemsPerPage;
-  let currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem)
+  let filteredItems = data.filter((item) => item.currentStock > 0);
+
+  if (search.length >= 3) {
+    //filter items if search length greater than 3
+    filteredItems = filteredItems.filter((user) => {
+      return user.name.toLowerCase().includes(search.toLowerCase());
+    });
+  }
+
+  const indexOfLastItem = currentPage * itemsPerPage; //pagination logic
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  let currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await fetch(`${baseUrl}/api/order/createOrder`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-   
+      const data = await response.json();
 
-   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const response = await fetch(`${baseUrl}/api/order/createOrder`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+      // show message
+      setMessage(data?.message ?? "Data saved successfully");
 
-    const data = await response.json();
+      // hide form if success
+      setShowForm(!data?.success ? true : false);
 
-    // show message
-    setMessage(data?.message ?? "Data saved successfully");
+      if (data?.success) {
+        fetchData(); // refresh data
+      }
 
-    // hide form if success
-    setShowForm(!data?.success ? true : false);
-
-    if (data?.success) {
-      fetchData(); // refresh data
+      // clear message after 3 seconds
+      setTimeout(() => setMessage(""), 3000);
+    } catch (err) {
+      console.log(err);
+      setMessage(err.message ?? "Server failed");
+      setShowForm(true);
+      setTimeout(() => setMessage(""), 3000);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    // clear message after 3 seconds
-    setTimeout(() => setMessage(""), 3000);
-
-  } catch (err) {
-    console.log(err);
-    setMessage(err.message ?? "Server failed");
-    setShowForm(true);
-    setTimeout(() => setMessage(""), 3000);
-  }
-};
-
-
-
-   const categories = [
+  const categories = [
     "electronics",
     "stationery",
     "groceries",
@@ -100,70 +130,62 @@ function Order() {
     "other",
   ];
 
-
-  function Capitalise(word){
-    if(!word){
-        return ""
-    }
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-  }
-
-
-    if (search.length >= 3) {
-    currentItems = currentItems.filter((user) => {
-      return user.name.toLowerCase().includes(search.toLowerCase());
-    });
+  if (loading) {
+    return <Loader loading={loading} />;
   }
 
   return (
     <div>
-      <h1 className="font-bold text-5xl flex justify-center items center mt-5"> Place Order For Customers </h1>
+      <h1 className="font-bold text-5xl flex justify-center items center mt-5">
+        {" "}
+        Place Order For Customers{" "}
+      </h1>
       <div className="relative">
-          <input
-            type="text"
-            placeholder="search..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="outline-none border  rounded-2xl mt-3 p-2 ml-5"
-
-          />
-          <BsSearch className="absolute left-47 top-6" />
-        </div>
-  <div className="flex justify-center items-center flex-wrap m-5 gap-12 border rounded-lg px-5 py-5 pt-15 max-h-[500px] overflow-y-auto">
-    {currentItems
-      .filter(item => item.currentStock > 0)
-      .map((item, index) => (
-        <div
-          key={index}
-          className="flex flex-col p-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg duration-400 gap-2 w-60 bg-gray-500"
-        >
-          <div className="flex gap-2">
-            <span className="font-bold">Name:</span>
-            <span>{Capitalise(item?.name)}</span>
-          </div>
-          <div className="flex gap-2">
-            <span className="font-bold">Category:</span>
-            <span>{Capitalise(item?.category)}</span>
-          </div>
-          <div className="flex gap-2">
-            <span className="font-bold">Current Stock:</span>
-            <span>{item?.currentStock}</span>
-          </div>
-          <div className="flex justify-end">
-             <button className="flex justify-center items center p-2 bg-blue-500 border rounded-lg w-30" 
-              onClick={() => {setShowForm(true);
-                 setFormData({
-                  productName : item?.name,
-                  category : item?.category.toLowerCase(),
-                  quantity : item?.currentStock
-                 })}
-              }>
-                Create Order
-          </button>
+        <input
+          type="text"
+          placeholder="search..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="outline-none border  rounded-2xl mt-3 p-2 ml-5"
+        />
+        <BsSearch className="absolute left-47 top-6" />
+      </div>
+      <div className="flex justify-center items-center flex-wrap m-5 gap-12 border rounded-lg px-5 py-5 pt-15 max-h-[500px] overflow-y-auto">
+        {currentItems.map((item) => (
+          <div
+            key={item._id || item.id}
+            className="flex flex-col p-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg duration-400 gap-2 w-60 bg-gray-500"
+          >
+            <div className="flex gap-2">
+              <span className="font-bold">Name:</span>
+              <span>{Capitalise(item?.name)}</span>
             </div>
-        </div>
-      ))}
-       {showForm && (
+            <div className="flex gap-2">
+              <span className="font-bold">Category:</span>
+              <span>{Capitalise(item?.category)}</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="font-bold">Current Stock:</span>
+              <span>{item?.currentStock}</span>
+            </div>
+            <div className="flex justify-end">
+              <button
+                className="flex justify-center items center p-2 bg-blue-500 border rounded-lg w-30"
+                onClick={() => {
+                  setShowForm(true);
+                  setFormData({
+                    productName: item?.name,
+                    category: item?.category.toLowerCase(),
+                    quantity: item?.currentStock,
+                  });
+                }}
+              >
+                Create Order
+              </button>
+            </div>
+          </div>
+        ))}
+        {showForm && (
           <form
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
                  bg-white border border-gray-300 rounded-xl shadow-lg p-6 w-full max-w-md z-10"
@@ -238,53 +260,48 @@ function Order() {
               Submit
             </button>
             {message && (
-        <p className="text-sm text-center bg-blue-200 border rounded-lg p-2">
-          {message}
-        </p>
-      )}
+              <p className="text-sm text-center bg-blue-200 border rounded-lg p-2">
+                {message}
+              </p>
+            )}
           </form>
         )}
-  </div>
-    <div className="flex justify-center items-center z-20 mt-10 ml-35">
-              <div className="flex gap-2">
-                <button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  disabled={currentPage === 1}
-                  className="px-3 py-1 border rounded disabled:opacity-50"
-                >
-                  Prev
-                </button>
+      </div>
+      <div className="flex justify-center items-center z-20 mt-10 ml-[35px]">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`px-3 py-1 border rounded ${
-                        page === currentPage ? "bg-blue-600 text-white" : ""
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ),
-                )}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`px-3 py-1 border rounded ${
+                page === currentPage ? "bg-blue-600 text-white" : ""
+              }`}
+            >
+              {page}
+            </button>
+          ))}
 
-                <button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="px-3 py-1 border rounded disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-  </div>
-  
-);
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default Order;

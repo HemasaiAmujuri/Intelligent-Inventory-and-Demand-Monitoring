@@ -25,11 +25,12 @@ const InventoryProductsSchema = new mongoose.Schema(
     currentStock: {
       type: Number,
       required: true,
+      min: 0   // current stock never be a negative
     },
     reOrderPoint: {
       type: Number,
-      required: true,
-      default : 5
+      default : 5,
+      min: 0     // re-order Point never be a negative
     },
       isDeleted : {         // for soft delete
       type : Boolean,

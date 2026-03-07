@@ -4,7 +4,8 @@ import Register from "./pages/register";
 import Login from "./pages/login";
 import Layout from "./components/layout";
 import Dashboard from "./pages/dashboard";
-import Order from "./pages/order"
+import Order from "./pages/order";
+import ProtectedRoute from "./components/protectedRoute";
 
 function App() {
   return (
@@ -13,10 +14,34 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route element={<Layout />}>
-          <Route path="/inventoryList" element={<InventoryList />} />
-          <Route path="/dashboard" element={ <Dashboard />}/>
-          <Route path="/order" element={ <Order />} />
+        <Route element={<Layout />}>            
+          <Route
+            path="/inventoryList"
+            element={
+              <ProtectedRoute>   
+                {" "}
+                <InventoryList />{" "}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                {" "}
+                <Dashboard />{" "}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/order"
+            element={
+              <ProtectedRoute>
+                {" "}
+                <Order />{" "}
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
     </Router>

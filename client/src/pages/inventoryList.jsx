@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { BsSearch } from "react-icons/bs";
+import Capitalise from "../utils/utils";
+import Loader from "../components/loader";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -15,58 +17,97 @@ function InventoryList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const itemsPerPage = 12;
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("")
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${baseURL}/api/inventory/inventoryList`);
+      const result = await response.json();
+      setData(result.data || []);
+    } catch (error) {
+      console.error(error);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${baseURL}/api/inventory/inventoryList`);
-        const result = await response.json();
-        setData(result.data || []);
-      } catch (error) {
-        console.error(error);
-        setData([]);
-      }
-    };
-
     fetchData();
-  }, [formData]);
+  }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    const { name, ...payLoad } = formData;
-    const capitalisedName = Capitalise(name.trim());
+const handleSubmit = async (e) => {
+  e.preventDefault(); // prevent default first
 
-    e.preventDefault();
-    try {
-      const response = await fetch(`${baseURL}/api/inventory/addInventory`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: capitalisedName, ...payLoad }),
+  const { name, category, quantity, reOrderPoint } = formData;
+
+  // Validation for required fields
+  if (!name.trim() || !category || category === "Select Category" || quantity === "") {
+    setMessage("Please fill all the required fields."); // show error
+    setTimeout(()=>{
+      setMessage("")
+    },2000);
+    return; // stop submission
+  }
+
+  const capitalisedName = Capitalise(name.trim());
+  setLoading(true);
+
+  try {
+    const response = await fetch(`${baseURL}/api/inventory/addInventory`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name: capitalisedName, category, quantity, reOrderPoint }),
+    });
+
+    if (response.ok) {
+      // Reset form
+      setFormData({
+        name: "",
+        category: "",
+        quantity: 0,
+        reOrderPoint: 0,
       });
-      if (response.ok) {
-        setFormData({
-          name: "",
-          category: "",
-          quantity: "",
-          reOrderPoint: "",
-        });
-        setShowForm(false);
-      }
-    } catch (err) {
-      console.log(err);
+      setShowForm(false); // close form
+      await fetchData();
+    } else {
+      const errorData = await response.json();
+      setMessage(errorData.message || "Something went wrong.");
     }
-  };
+  } catch (err) {
+    console.log(err);
+    setMessage("Failed to submit form.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  let filteredData = data;
+
+  if (search.length >= 3) {
+    filteredData = data.filter((item) =>
+      item.name.toLowerCase().includes(search.toLowerCase()),
+    );
+  }
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  let currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const categories = [
     "electronics",
@@ -82,21 +123,8 @@ function InventoryList() {
     "other",
   ];
 
-  function Capitalise(word) {
-    if (!word) {
-      return " ";
-    }
-    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-  }
-
-  if (search.length >= 3) {
-    currentItems = currentItems.filter((user) => {
-      return user.name.toLowerCase().includes(search.toLowerCase());
-    });
-  }
-
   return (
-    <div className="relative">
+    <div className="relative mb-5">
       <div className="flex-col justify-between items-center">
         <div className="flex items-center justify-between mt-10 mb-5 ml-150">
           <h1 className="text-5xl font-bold">Inventory List</h1>
@@ -135,7 +163,7 @@ function InventoryList() {
 
             <tbody>
               {currentItems.map((item, index) => (
-                <tr key={item.id} className="text-center">
+                <tr key={item._id || item.id} className="text-center">
                   <td className="border px-4 py-2">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
@@ -145,7 +173,7 @@ function InventoryList() {
                   </td>
                   <td className="border px-4 py-2">{item.currentStock}</td>
                   <td className="border px-4 py-2">{item.reOrderPoint}</td>
-                  <td className="border px-4 py-2 font semi-bold">
+                  <td className="border px-4 py-2 font-semibold">
                     {item.currentStock === 0 ? (
                       <span className="text-red-500">Out of Stock</span>
                     ) : item.currentStock < item.reOrderPoint ? (
@@ -280,9 +308,16 @@ function InventoryList() {
             >
               Submit
             </button>
+
+             {message && (
+              <p className="text-sm text-center bg-blue-200 border rounded-lg p-2">
+                {message}
+              </p>
+            )}
           </form>
         )}
       </div>
+      {loading && <Loader loading={loading} />}
     </div>
   );
 }

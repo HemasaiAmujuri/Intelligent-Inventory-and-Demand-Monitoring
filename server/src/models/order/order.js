@@ -6,6 +6,10 @@ const orderSchema = new mongoose.Schema({
         type : String,
         required : true
     },
+    orderedBy : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : "users"
+    },
     category: {
       type: String,
       enum: [
@@ -24,12 +28,18 @@ const orderSchema = new mongoose.Schema({
     },
     quantity : {
         type : Number,
-        required : true
+        required : true,
+        min:1
     },
     isDeleted : {             // for soft delete 
         type : Boolean,
         default : false
     },
+    status: {
+  type: String,
+  enum: ["pending", "confirmed", "cancelled", "delivered"],
+  default: "confirmed"
+}
 }, { timestamps : true});
 
 
