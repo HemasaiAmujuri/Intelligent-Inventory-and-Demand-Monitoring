@@ -143,9 +143,9 @@ const handleSubmit = async (e) => {
             placeholder="search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="outline-none border rounded-lg bg-gray-200 ml-105 mt-3 mb-2 p-1"
+            className="outline-none border rounded-lg bg-gray-200 ml-97 mt-3 mb-2 p-1"
           />
-          <BsSearch className="absolute left-145 top-5" />
+          <BsSearch className="absolute left-138 top-5" />
         </div>
 
         <div className="flex flex-col justify-center items-center">
